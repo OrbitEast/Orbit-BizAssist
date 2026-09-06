@@ -49,7 +49,7 @@
       }
       const rows=await request(`/rest/v1/orbit_bizassist_state?user_id=eq.${userId}&select=state`,{headers:jsonHeaders()});
       enabled=true;
-      if(rows?.[0]?.state)onCloudState(rows[0].state);
+      onCloudState?.(rows?.[0]?.state,JSON.parse(localStorage.getItem('orbit-biz-session')||'{}').user);
     }catch(err){console.info('Orbit cloud sync deferred:',err.message)}
   }
   async function push(state){
