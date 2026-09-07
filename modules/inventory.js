@@ -1,0 +1,1 @@
+/* Inventory module boundary. Inventory rendering remains in legacy-runtime.js during migration. */

@@ -1,0 +1,1 @@
+/* Khata module boundary. Khata rendering remains in legacy-runtime.js during migration. */

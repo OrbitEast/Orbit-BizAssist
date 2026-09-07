@@ -1,0 +1,11 @@
+const CONFIG={brand:'Orbit BizAssist',parentBrand:'Orbit East',tagline:'Simple tools for running your business.',defaultBusiness:'Orbit Café',currency:'INR',locale:'en-IN',taxRate:5,categories:['Beverages','Snacks','Bakery','Retail']};
+const seedItems=[['Chai','Beverages',20,8,'☕'],['Coffee','Beverages',90,5,'🥤'],['Veg Momos','Snacks',120,4,'🥟'],['Club Sandwich','Snacks',160,9,'🥪'],['Brownie','Bakery',80,6,'🍫']].map((x,i)=>({id:'item-'+(i+1),name:x[0],category:x[1],selling:x[2],cost:Math.round(x[2]*.45),stock:x[3],threshold:5,sku:'OB-'+(101+i),icon:x[4]}));
+const now=()=>new Date().toISOString();
+const createInitialState=()=>{const initial={businesses:[{id:'biz-'+Date.now(),name:CONFIG.defaultBusiness,phone:'',gstin:'',currency:CONFIG.currency,taxRate:CONFIG.taxRate,items:seedItems,invoices:[],contacts:[],ledger:[],expenses:[],stockLog:[],staff:[{id:'owner',name:'Owner',role:'Owner / Admin'}]}],activeBusiness:null,cart:[],documentType:'Invoice',payment:'UPI',discount:{type:'flat',value:0},user:null,page:'dashboard'};initial.activeBusiness=initial.businesses[0].id;return initial};
+let state=createInitialState();
+const $=q=>document.querySelector(q);
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const biz=()=>state.businesses.find(b=>b.id===state.activeBusiness)||state.businesses[0];
+const money=n=>new Intl.NumberFormat(biz().locale||CONFIG.locale,{style:'currency',currency:biz().currency||CONFIG.currency,maximumFractionDigits:0}).format(n||0);
+const save=()=>{const pending=window.orbitCloud?.push({...state,cart:[]});pending?.catch(()=>toast('Cloud save failed. Please try again.'))};
+window.AppState={get:()=>state,set:next=>{state=next;return state},merge:next=>{state={...state,...next};return state},initial:createInitialState};

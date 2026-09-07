@@ -1,0 +1,1 @@
+/* Customers module boundary. Customer rendering remains in legacy-runtime.js during migration. */

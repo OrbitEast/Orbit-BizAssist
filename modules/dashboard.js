@@ -1,0 +1,1 @@
+/* Dashboard module boundary. Dashboard rendering remains in legacy-runtime.js during migration. */

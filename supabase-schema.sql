@@ -1,5 +1,6 @@
 -- Orbit BizAssist: run once in Supabase SQL Editor.
--- Enable Email + Password and Phone providers in Authentication → Providers.
+-- Enable Google provider in Authentication → Providers.
+-- The browser stores business state only in this table; no local storage is used.
 
 create table if not exists public.orbit_bizassist_state (
   user_id uuid primary key references auth.users(id) on delete cascade,

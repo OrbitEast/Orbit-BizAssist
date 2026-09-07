@@ -1,0 +1,1 @@
+/* Invoices module boundary. Invoice rendering remains in legacy-runtime.js during migration. */

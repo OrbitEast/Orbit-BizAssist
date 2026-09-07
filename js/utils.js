@@ -1,0 +1,1 @@
+window.AppUtils={now,esc,money};
