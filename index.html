@@ -2,11 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b0d17">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b0d17"
+  >
+
+  <meta
+    name="description"
+    content="Orbit BizAssist — a modern business management platform for growing businesses."
+  >
+
+  <meta
+    name="application-name"
+    content="Orbit BizAssist"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
 
   <title>Orbit BizAssist</title>
 
+  <!--
+    Fonts
+    Keep typography centralized here so every module
+    uses the same visual system.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!--
+    Design System
+    Order matters:
+    tokens → base → layout → components → responsive
+  -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -15,16 +61,70 @@
 </head>
 
 <body>
-  <div id="app"></div>
-  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!--
+    Application root.
+    Router / renderer will mount every screen here:
+    login, dashboard, invoices, inventory, khata, etc.
+  -->
+  <main
+    id="app"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="app-loading">
+      <div class="loading-brand">
+        <span class="brand-mark" aria-hidden="true">O</span>
+        <span>Orbit BizAssist</span>
+      </div>
+
+      <div
+        class="loading-spinner"
+        role="status"
+        aria-label="Loading"
+      ></div>
+
+      <p>Preparing your workspace…</p>
+    </div>
+  </main>
+
+  <!--
+    Global toast / notification layer.
+    Individual modules should use this instead of creating
+    their own notification containers.
+  -->
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <!--
+    Core application layer
+    -------------------------------------------------------
+    Keep the existing Supabase/Auth implementation intact.
+    The files below communicate through the existing globals
+    and application state.
+  -->
 
   <script src="js/state.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/router.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/storage.js"></script>
+
+  <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
+
+  <script src="js/router.js"></script>
   <script src="js/ui.js"></script>
+
+  <!--
+    Application bootstrap.
+    This MUST remain last because it starts the application
+    after the dependencies above are available.
+  -->
   <script src="js/app.js"></script>
+
 </body>
 </html>
