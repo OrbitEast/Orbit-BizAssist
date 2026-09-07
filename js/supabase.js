@@ -3,7 +3,7 @@
 
   const CONFIG = Object.freeze({
     url: "https://tquanlpmtvizjbdounnj.supabase.co",
-    key: "sb_publishable_sjDaL7MyAXoYoM1KIbYLbg_EGfo6Omq",
+    key: "sb_publishable_sjDaL7MyAXoYoM1KlbYLbg_EGfo6Omq",
     table: "orbit_bizassist_state",
     storageKey: "orbit-bizassist-auth",
     sessionRefreshMargin: 60
