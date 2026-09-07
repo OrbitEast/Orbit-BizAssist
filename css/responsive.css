@@ -1,1 +1,499 @@
-@media(max-width:900px){.sidebar{display:none}.auth{grid-template-columns:1fr}.auth-visual{min-height:260px;height:31vh}.visual-content{min-height:260px;padding:24px}.auth-visual h1{font-size:35px;margin:8px 0}.auth-visual p{display:none}.auth-card{padding:35px 0 45px}.parent-brand{margin-bottom:32px}.metrics{grid-template-columns:1fr 1fr}.grid,.two{grid-template-columns:1fr}.cart{position:static}.products{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.top-right{gap:5px}.top-right .role{display:none}.page{padding:22px 16px}.products{gap:9px}.product-img{height:95px}.form-grid{grid-template-columns:1fr}.page-title{font-size:22px}}
+/* =========================================================
+   ORBIT BIZASSIST — RESPONSIVE
+   Mobile, tablet and accessibility adaptations.
+   ========================================================= */
+
+
+/* =========================================================
+   LARGE TABLETS / SMALL LAPTOPS
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+
+  .auth-content {
+    padding: 48px;
+  }
+
+  .auth-hero h1 {
+    font-size: clamp(40px, 5vw, 60px);
+  }
+
+  .dashboard {
+    padding-inline: var(--space-6);
+  }
+
+  .metric-grid,
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pos-layout,
+  .two {
+    grid-template-columns: 1fr;
+  }
+
+  .cart {
+    position: static;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  /* ---------- Authentication ---------- */
+
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-showcase {
+    min-height: 320px;
+  }
+
+  .auth-content {
+    min-height: 320px;
+    padding: 32px;
+  }
+
+  .auth-panel {
+    min-height: auto;
+    padding: 24px 0 48px;
+  }
+
+  .auth-hero {
+    max-width: 620px;
+  }
+
+  .auth-hero h1 {
+    font-size: clamp(38px, 7vw, 54px);
+  }
+
+  .auth-hero p {
+    font-size: var(--text-md);
+  }
+
+  .auth-features {
+    gap: var(--space-4);
+  }
+
+
+  /* ---------- Application ---------- */
+
+  .sidebar {
+    display: none;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+
+  .topbar {
+    padding-inline: var(--space-5);
+  }
+
+  .dashboard,
+  .page {
+    padding-inline: var(--space-5);
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+  }
+
+
+  /* ---------- Dashboard ---------- */
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-grid,
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+
+  /* ---------- POS ---------- */
+
+  .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pos-layout,
+  .two {
+    grid-template-columns: 1fr;
+  }
+
+  .cart {
+    position: static;
+  }
+
+
+  /* ---------- Generic grids ---------- */
+
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================
+   LARGE MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+  /* ---------- Global ---------- */
+
+  :root {
+    --topbar-height: 64px;
+  }
+
+  body {
+    font-size: var(--text-md);
+  }
+
+
+  /* ---------- Authentication ---------- */
+
+  .auth-showcase {
+    min-height: 260px;
+  }
+
+  .auth-content {
+    min-height: 260px;
+    padding: 24px;
+  }
+
+  .auth-hero h1 {
+    margin: var(--space-2) 0 var(--space-3);
+    font-size: 36px;
+  }
+
+  .auth-hero p,
+  .auth-features {
+    display: none;
+  }
+
+  .auth-panel {
+    padding: 16px 0 40px;
+  }
+
+  .login-box {
+    width: min(100% - 32px, 430px);
+  }
+
+  .login-copy {
+    margin-top: 34px;
+  }
+
+
+  /* ---------- Topbar ---------- */
+
+  .topbar {
+    min-height: var(--topbar-height);
+    padding-inline: var(--space-4);
+  }
+
+  .topbar h1 {
+    font-size: var(--text-xl);
+  }
+
+  .topbar .eyebrow {
+    display: none;
+  }
+
+  .topbar-actions {
+    gap: var(--space-2);
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+
+  /* ---------- Dashboard ---------- */
+
+  .dashboard,
+  .page {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+
+  .welcome-card {
+    min-height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: var(--space-5);
+  }
+
+  .welcome-card h2 {
+    font-size: 26px;
+  }
+
+  .welcome-card .primary-btn {
+    width: 100%;
+  }
+
+
+  /* ---------- Metrics ---------- */
+
+  .metric-grid,
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .metric-card {
+    min-height: 128px;
+    padding: var(--space-4);
+  }
+
+  .metric-card strong {
+    font-size: var(--text-2xl);
+  }
+
+
+  /* ---------- Panels ---------- */
+
+  .panel-head {
+    padding-inline: var(--space-4);
+  }
+
+  .chart-placeholder {
+    min-height: 240px;
+  }
+
+  .chart-empty {
+    padding: var(--space-6);
+  }
+
+
+  /* ---------- Quick Actions ---------- */
+
+  .quick-actions {
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .quick-actions button {
+    min-height: 72px;
+    padding: var(--space-3);
+  }
+
+
+  /* ---------- POS ---------- */
+
+  .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .product-img {
+    min-height: 96px;
+    font-size: 34px;
+  }
+
+  .product-copy {
+    padding: var(--space-3);
+  }
+
+
+  /* ---------- Forms ---------- */
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    min-height: 44px;
+  }
+
+
+  /* ---------- Generic grids ---------- */
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+
+  /* ---------- Page headers ---------- */
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-title {
+    font-size: var(--text-2xl);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar input {
+    width: 100%;
+  }
+
+
+  /* ---------- Modal ---------- */
+
+  .modal-bg {
+    padding: var(--space-3);
+    align-items: end;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-lg) var(--radius-lg);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+  }
+
+
+  /* ---------- Toast ---------- */
+
+  .toast {
+    bottom: var(--space-4);
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .auth-content {
+    padding: 20px;
+  }
+
+  .auth-hero h1 {
+    font-size: 32px;
+  }
+
+  .login-box {
+    width: calc(100% - 24px);
+  }
+
+  .login-brand .brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .login-copy h2 {
+    font-size: 26px;
+  }
+
+  .metric-grid,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .products {
+    grid-template-columns: 1fr;
+  }
+
+  .payment {
+    flex-wrap: wrap;
+  }
+
+  .payment button {
+    min-width: calc(50% - 4px);
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   TOUCH DEVICES
+   ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .icon-btn:hover,
+  .nav-item:hover,
+  .metric-card:hover,
+  .product:hover,
+  .quick-actions button:hover {
+    transform: none;
+  }
+
+  .nav-item,
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn,
+  .icon-btn,
+  .quick-actions button,
+  .product {
+    touch-action: manipulation;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .auth-grid,
+  .auth-showcase::before,
+  .auth-showcase::after,
+  .login-box,
+  .modal-bg,
+  .modal {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+  }
+}
