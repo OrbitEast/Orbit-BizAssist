@@ -1,384 +1,707 @@
 (() => {
   "use strict";
 
+  /*
+   * Orbit BizAssist — Supabase Cloud Layer
+   * --------------------------------------
+   * Google OAuth
+   * Session persistence + refresh
+   * Cloud state sync
+   * Local-first compatibility
+   */
+
   const CONFIG = Object.freeze({
     url: "https://tquanlpmtvizjbdounnj.supabase.co",
-    key: "sb_publishable_sjDaL7MyAXoYoM1KlbYLbg_EGfo6Omq",
+    key: "sb_publishable_sjDaL7MyAXoYoM1KIbYLbg_EGfo6Omq",
     table: "orbit_bizassist_state",
     storageKey: "orbit-bizassist-auth",
     sessionRefreshMargin: 60
   });
 
-  let session = null;
-  let user = null;
-  let enabled = false;
+  let currentSession = null;
+  let currentProfile = null;
+  let initialized = false;
+  let refreshTimer = null;
 
-  const authHeaders = (accessToken = session?.access_token) => ({
-    apikey: CONFIG.key,
-    Authorization: `Bearer ${accessToken || CONFIG.key}`,
-    "Content-Type": "application/json"
-  });
+  /* -------------------------------------------------------
+     Helpers
+  ------------------------------------------------------- */
 
-  function appRedirectUrl() {
+  function apiUrl(path = "") {
+    return `${CONFIG.url}${path}`;
+  }
+
+  function getRedirectUrl() {
     return `${window.location.origin}${window.location.pathname}`;
   }
 
-  function safeJson(value) {
+  function getStoredSession() {
     try {
-      return JSON.parse(value);
-    } catch {
+      const raw = localStorage.getItem(CONFIG.storageKey);
+      if (!raw) return null;
+
+      const parsed = JSON.parse(raw);
+
+      if (
+        !parsed ||
+        typeof parsed !== "object" ||
+        !parsed.access_token ||
+        !parsed.refresh_token
+      ) {
+        return null;
+      }
+
+      return parsed;
+    } catch (error) {
+      console.warn("Orbit Cloud: unable to read stored session.", error);
       return null;
     }
   }
 
-  function saveSession(nextSession) {
-    session = nextSession || null;
+  function storeSession(session) {
+    if (!session) return;
 
-    if (session) {
+    currentSession = session;
+
+    try {
       localStorage.setItem(
         CONFIG.storageKey,
         JSON.stringify(session)
       );
-    } else {
-      localStorage.removeItem(CONFIG.storageKey);
+    } catch (error) {
+      console.warn("Orbit Cloud: unable to store session.", error);
     }
 
-    enabled = Boolean(session?.access_token);
+    scheduleRefresh(session);
   }
 
-  function loadStoredSession() {
-    const raw = localStorage.getItem(CONFIG.storageKey);
-    if (!raw) return null;
+  function clearSession() {
+    currentSession = null;
+    currentProfile = null;
 
-    const stored = safeJson(raw);
-
-    if (!stored?.access_token) {
-      localStorage.removeItem(CONFIG.storageKey);
-      return null;
+    if (refreshTimer) {
+      clearTimeout(refreshTimer);
+      refreshTimer = null;
     }
 
-    session = stored;
-    enabled = true;
-
-    return session;
-  }
-
-  function decodeJwtPayload(token) {
     try {
-      const part = token.split(".")[1];
-      if (!part) return null;
+      localStorage.removeItem(CONFIG.storageKey);
+    } catch (error) {
+      console.warn("Orbit Cloud: unable to clear stored session.", error);
+    }
+  }
 
-      const normalized = part
+  function decodeJwt(token) {
+    try {
+      const parts = String(token).split(".");
+      if (parts.length !== 3) return null;
+
+      const payload = parts[1]
         .replace(/-/g, "+")
         .replace(/_/g, "/");
 
-      return JSON.parse(atob(normalized));
+      const padded =
+        payload + "=".repeat((4 - (payload.length % 4)) % 4);
+
+      return JSON.parse(atob(padded));
     } catch {
       return null;
     }
   }
 
-  function isTokenExpiring(token) {
-    const payload = decodeJwtPayload(token);
+  function sessionExpired(session) {
+    if (!session?.access_token) return true;
+
+    const payload = decodeJwt(session.access_token);
     if (!payload?.exp) return false;
+
+    return payload.exp <= Math.floor(Date.now() / 1000);
+  }
+
+  function sessionNeedsRefresh(session) {
+    if (!session?.access_token) return true;
+
+    const payload = decodeJwt(session.access_token);
+
+    if (!payload?.exp) {
+      return false;
+    }
 
     const now = Math.floor(Date.now() / 1000);
 
-    return payload.exp - now <= CONFIG.sessionRefreshMargin;
+    return (
+      payload.exp <=
+      now + CONFIG.sessionRefreshMargin
+    );
+  }
+
+  function authHeaders(accessToken = null) {
+    return {
+      apikey: CONFIG.key,
+      Authorization: `Bearer ${
+        accessToken || currentSession?.access_token || CONFIG.key
+      }`,
+      "Content-Type": "application/json"
+    };
   }
 
   async function request(path, options = {}) {
-    const response = await fetch(`${CONFIG.url}${path}`, options);
+    const response = await fetch(apiUrl(path), {
+      ...options,
+      headers: {
+        ...authHeaders(options.accessToken),
+        ...(options.headers || {})
+      }
+    });
 
     const text = await response.text();
-    const data = text ? safeJson(text) : null;
+
+    let data = null;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = text;
+    }
 
     if (!response.ok) {
       const message =
-        data?.msg ||
         data?.message ||
         data?.error_description ||
+        data?.error ||
+        data?.msg ||
         text ||
-        `Supabase request failed (${response.status})`;
+        `Request failed with status ${response.status}`;
 
       const error = new Error(message);
       error.status = response.status;
       error.data = data;
+
       throw error;
     }
 
     return data;
   }
 
-  async function refreshSession() {
-    const refreshToken = session?.refresh_token;
+  /* -------------------------------------------------------
+     Session refresh
+  ------------------------------------------------------- */
 
+  async function refreshSession(refreshToken) {
     if (!refreshToken) {
-      saveSession(null);
-      user = null;
-      return false;
+      throw new Error("No refresh token available.");
     }
 
-    try {
-      const refreshed = await request(
-        "/auth/v1/token?grant_type=refresh_token",
-        {
-          method: "POST",
-          headers: {
-            apikey: CONFIG.key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            refresh_token: refreshToken
-          })
-        }
-      );
-
-      if (!refreshed?.access_token) {
-        throw new Error("Supabase did not return a new access token.");
-      }
-
-      saveSession({
-        access_token: refreshed.access_token,
-        refresh_token:
-          refreshed.refresh_token || refreshToken,
-        expires_in: refreshed.expires_in,
-        expires_at:
-          refreshed.expires_at ||
-          Math.floor(Date.now() / 1000) +
-            (refreshed.expires_in || 3600),
-        token_type: refreshed.token_type || "bearer",
-        user: refreshed.user || session?.user || null
-      });
-
-      user = refreshed.user || session?.user || null;
-
-      return true;
-    } catch (error) {
-      console.warn("Orbit Auth refresh failed:", error);
-      saveSession(null);
-      user = null;
-      enabled = false;
-      return false;
-    }
-  }
-
-  async function ensureValidSession() {
-    if (!session?.access_token) {
-      loadStoredSession();
-    }
-
-    if (!session?.access_token) {
-      return false;
-    }
-
-    if (isTokenExpiring(session.access_token)) {
-      return refreshSession();
-    }
-
-    return true;
-  }
-
-  function readOAuthSession() {
-    const hash = window.location.hash;
-
-    if (!hash || hash.length < 2) {
-      return false;
-    }
-
-    const params = new URLSearchParams(hash.slice(1));
-
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
-
-    if (!accessToken) {
-      const error =
-        params.get("error_description") ||
-        params.get("error");
-
-      if (error) {
-        console.error("Google authentication failed:", error);
-      }
-
-      return false;
-    }
-
-    const expiresIn = Number(params.get("expires_in") || 3600);
-
-    saveSession({
-      access_token: accessToken,
-      refresh_token: refreshToken || null,
-      expires_in: expiresIn,
-      expires_at:
-        Number(params.get("expires_at")) ||
-        Math.floor(Date.now() / 1000) + expiresIn,
-      token_type: params.get("token_type") || "bearer"
-    });
-
-    // Remove OAuth tokens from the visible browser URL.
-    window.history.replaceState(
-      null,
-      document.title,
-      `${window.location.pathname}${window.location.search}`
-    );
-
-    return true;
-  }
-
-  async function fetchUser() {
-    if (!session?.access_token) {
-      throw new Error("No active Supabase session.");
-    }
-
-    const profile = await request("/auth/v1/user", {
-      headers: authHeaders()
-    });
-
-    user = profile;
-
-    if (session) {
-      session.user = profile;
-      localStorage.setItem(
-        CONFIG.storageKey,
-        JSON.stringify(session)
-      );
-    }
-
-    return profile;
-  }
-
-  async function loadCloudState() {
-    const rows = await request(
-      `/rest/v1/${CONFIG.table}?user_id=eq.${encodeURIComponent(
-        user.id
-      )}&select=state&limit=1`,
-      {
-        headers: authHeaders()
-      }
-    );
-
-    return rows?.[0]?.state || null;
-  }
-
-  async function push(nextState) {
-    if (!(await ensureValidSession())) {
-      throw new Error("Supabase session is not active.");
-    }
-
-    if (!user?.id) {
-      await fetchUser();
-    }
-
-    await request(
-      `/rest/v1/${CONFIG.table}?on_conflict=user_id`,
+    const response = await fetch(
+      apiUrl("/auth/v1/token?grant_type=refresh_token"),
       {
         method: "POST",
         headers: {
-          ...authHeaders(),
-          Prefer: "resolution=merge-duplicates,return=minimal"
+          apikey: CONFIG.key,
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          user_id: user.id,
-          state: nextState,
-          updated_at: new Date().toISOString()
+          refresh_token: refreshToken
         })
       }
     );
 
+    const text = await response.text();
+
+    let data;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = null;
+    }
+
+    if (!response.ok) {
+      const message =
+        data?.msg ||
+        data?.message ||
+        data?.error_description ||
+        data?.error ||
+        text ||
+        "Unable to refresh Supabase session.";
+
+      throw new Error(message);
+    }
+
+    storeSession(data);
+
+    return data;
+  }
+
+  function scheduleRefresh(session) {
+    if (refreshTimer) {
+      clearTimeout(refreshTimer);
+      refreshTimer = null;
+    }
+
+    const payload = decodeJwt(session?.access_token);
+
+    if (!payload?.exp || !session?.refresh_token) {
+      return;
+    }
+
+    const now = Date.now();
+    const expiresAt = payload.exp * 1000;
+
+    const refreshIn = Math.max(
+      10_000,
+      expiresAt -
+        now -
+        CONFIG.sessionRefreshMargin * 1000
+    );
+
+    refreshTimer = setTimeout(async () => {
+      try {
+        await refreshSession(session.refresh_token);
+      } catch (error) {
+        console.warn(
+          "Orbit Cloud: automatic session refresh failed.",
+          error
+        );
+      }
+    }, refreshIn);
+  }
+
+  /* -------------------------------------------------------
+     OAuth callback
+  ------------------------------------------------------- */
+
+  function readOAuthSession() {
+    const hash = window.location.hash;
+
+    if (!hash || !hash.includes("access_token=")) {
+      return null;
+    }
+
+    const params = new URLSearchParams(
+      hash.replace(/^#/, "")
+    );
+
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+
+    if (!accessToken || !refreshToken) {
+      return null;
+    }
+
+    const expiresIn = Number(
+      params.get("expires_in") || 3600
+    );
+
+    const session = {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: expiresIn,
+      token_type: params.get("token_type") || "bearer",
+      expires_at:
+        Math.floor(Date.now() / 1000) + expiresIn
+    };
+
+    return session;
+  }
+
+  function cleanOAuthHash() {
+    if (!window.location.hash.includes("access_token=")) {
+      return;
+    }
+
+    const cleanUrl =
+      `${window.location.pathname}` +
+      `${window.location.search}` +
+      "#dashboard";
+
+    window.history.replaceState(
+      null,
+      "",
+      cleanUrl
+    );
+  }
+
+  /* -------------------------------------------------------
+     User profile
+  ------------------------------------------------------- */
+
+  async function getUser(accessToken) {
+    if (!accessToken) {
+      throw new Error("Missing Supabase access token.");
+    }
+
+    const response = await fetch(
+      apiUrl("/auth/v1/user"),
+      {
+        method: "GET",
+        headers: {
+          apikey: CONFIG.key,
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = null;
+    }
+
+    if (!response.ok) {
+      const message =
+        data?.message ||
+        data?.error_description ||
+        data?.error ||
+        text ||
+        `Unable to load user (${response.status})`;
+
+      throw new Error(message);
+    }
+
+    return data;
+  }
+
+  /* -------------------------------------------------------
+     Cloud state
+  ------------------------------------------------------- */
+
+  async function loadCloudState() {
+    if (!currentSession?.access_token) {
+      return null;
+    }
+
+    const userId =
+      currentProfile?.id ||
+      decodeJwt(currentSession.access_token)?.sub;
+
+    if (!userId) {
+      return null;
+    }
+
+    const params = new URLSearchParams({
+      select: "user_id,state,updated_at",
+      user_id: `eq.${userId}`,
+      limit: "1"
+    });
+
+    const response = await fetch(
+      apiUrl(
+        `/rest/v1/${CONFIG.table}?${params.toString()}`
+      ),
+      {
+        method: "GET",
+        headers: {
+          apikey: CONFIG.key,
+          Authorization:
+            `Bearer ${currentSession.access_token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = null;
+    }
+
+    if (!response.ok) {
+      const message =
+        data?.message ||
+        data?.error ||
+        data?.hint ||
+        text ||
+        `Unable to load cloud state (${response.status})`;
+
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(data) || !data.length) {
+      return null;
+    }
+
+    return data[0]?.state || null;
+  }
+
+  async function saveCloudState(nextState) {
+    if (!currentSession?.access_token) {
+      return false;
+    }
+
+    const userId =
+      currentProfile?.id ||
+      decodeJwt(currentSession.access_token)?.sub;
+
+    if (!userId) {
+      throw new Error(
+        "Cannot save cloud state without user ID."
+      );
+    }
+
+    const payload = {
+      user_id: userId,
+      state: nextState,
+      updated_at: new Date().toISOString()
+    };
+
+    const response = await fetch(
+      apiUrl(`/rest/v1/${CONFIG.table}`),
+      {
+        method: "POST",
+        headers: {
+          apikey: CONFIG.key,
+          Authorization:
+            `Bearer ${currentSession.access_token}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      let data = null;
+
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
+
+      const message =
+        data?.message ||
+        data?.error ||
+        data?.hint ||
+        text ||
+        `Unable to save cloud state (${response.status})`;
+
+      throw new Error(message);
+    }
+
     return true;
   }
 
+  /* -------------------------------------------------------
+     Google authentication
+  ------------------------------------------------------- */
+
   function signInGoogle() {
-    const redirectTo = appRedirectUrl();
+    const redirectTo = getRedirectUrl();
 
-    const authorizeUrl =
-      `${CONFIG.url}/auth/v1/authorize` +
-      `?provider=google` +
-      `&redirect_to=${encodeURIComponent(redirectTo)}`;
+    const params = new URLSearchParams({
+      provider: "google",
+      redirect_to: redirectTo
+    });
 
-    window.location.assign(authorizeUrl);
+    const url =
+      apiUrl(
+        `/auth/v1/authorize?${params.toString()}`
+      );
+
+    window.location.assign(url);
   }
 
-  async function init(onCloudState) {
+  /* -------------------------------------------------------
+     Sign out
+  ------------------------------------------------------- */
+
+  async function signOut() {
+    const token = currentSession?.access_token;
+
     try {
-      // First priority: OAuth callback tokens.
-      const callbackSession = readOAuthSession();
-
-      // Otherwise restore the persisted session.
-      if (!callbackSession) {
-        loadStoredSession();
-      }
-
-      if (!(await ensureValidSession())) {
-        return false;
-      }
-
-      const profile = await fetchUser();
-
-      const cloudState = await loadCloudState();
-
-      enabled = true;
-
-      if (typeof onCloudState === "function") {
-        onCloudState(
-          cloudState || window.AppState.initial(),
-          profile
+      if (token) {
+        await fetch(
+          apiUrl("/auth/v1/logout"),
+          {
+            method: "POST",
+            headers: {
+              apikey: CONFIG.key,
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
       }
+    } catch (error) {
+      console.warn(
+        "Orbit Cloud: remote sign-out failed.",
+        error
+      );
+    } finally {
+      clearSession();
+    }
+  }
 
-      // New account: create its initial cloud state.
-      if (!cloudState) {
-        const initialState = window.AppState.initial();
+  /* -------------------------------------------------------
+     Initialization
+  ------------------------------------------------------- */
 
-        await push(initialState);
+  async function init(onReady) {
+    if (initialized && currentSession) {
+      return true;
+    }
 
-        if (typeof onCloudState === "function") {
-          onCloudState(initialState, profile);
+    try {
+      /* -----------------------------------------------
+         1. Check Google OAuth callback
+      ------------------------------------------------ */
+
+      const oauthSession = readOAuthSession();
+
+      if (oauthSession) {
+        storeSession(oauthSession);
+        cleanOAuthHash();
+      }
+
+      /* -----------------------------------------------
+         2. Restore previous session
+      ------------------------------------------------ */
+
+      if (!currentSession) {
+        const stored = getStoredSession();
+
+        if (stored) {
+          currentSession = stored;
         }
       }
 
+      if (!currentSession) {
+        initialized = true;
+        return false;
+      }
+
+      /* -----------------------------------------------
+         3. Refresh if necessary
+      ------------------------------------------------ */
+
+      if (
+        sessionNeedsRefresh(currentSession) &&
+        currentSession.refresh_token
+      ) {
+        try {
+          await refreshSession(
+            currentSession.refresh_token
+          );
+        } catch (refreshError) {
+          console.warn(
+            "Orbit Cloud: stored session could not be refreshed.",
+            refreshError
+          );
+
+          clearSession();
+          initialized = true;
+
+          return false;
+        }
+      }
+
+      /* -----------------------------------------------
+         4. Validate current user
+      ------------------------------------------------ */
+
+      currentProfile = await getUser(
+        currentSession.access_token
+      );
+
+      /* -----------------------------------------------
+         5. Restore cloud state
+      ------------------------------------------------ */
+
+      let remoteState = null;
+
+      try {
+        remoteState = await loadCloudState();
+      } catch (cloudError) {
+        console.warn(
+          "Orbit Cloud: cloud state unavailable.",
+          cloudError
+        );
+      }
+
+      initialized = true;
+
+      /* -----------------------------------------------
+         6. Send data back to application
+      ------------------------------------------------ */
+
+      if (typeof onReady === "function") {
+        onReady(
+          remoteState,
+          {
+            user: currentProfile
+          }
+        );
+      }
+
       return true;
+
     } catch (error) {
-      console.error("Orbit Cloud initialization failed:", error);
-      enabled = false;
-      return false;
+      console.error(
+        "Orbit Cloud initialization failed:",
+        error
+      );
+
+      clearSession();
+      initialized = true;
+
+      throw error;
     }
   }
 
-  async function signOut() {
-    try {
-      if (session?.access_token) {
-        await request("/auth/v1/logout", {
-          method: "POST",
-          headers: authHeaders()
-        });
-      }
-    } catch (error) {
-      console.warn("Supabase logout request failed:", error);
-    } finally {
-      saveSession(null);
-      session = null;
-      user = null;
-      enabled = false;
-    }
-  }
+  /* -------------------------------------------------------
+     Public API
+  ------------------------------------------------------- */
 
   window.orbitCloud = {
-    signInGoogle,
+    config: CONFIG,
+
     init,
-    push,
+
+    signInGoogle,
+
     signOut,
 
-    session: () => enabled,
+    session() {
+      return currentSession;
+    },
 
-    getSession: () =>
-      session
-        ? Object.freeze({ ...session })
-        : null,
+    user() {
+      return currentProfile;
+    },
 
-    getUser: () =>
-      user
-        ? Object.freeze({ ...user })
-        : null
+    async refresh() {
+      if (!currentSession?.refresh_token) {
+        return null;
+      }
+
+      return refreshSession(
+        currentSession.refresh_token
+      );
+    },
+
+    async load() {
+      return loadCloudState();
+    },
+
+    async save(nextState) {
+      return saveCloudState(nextState);
+    },
+
+    isAuthenticated() {
+      return Boolean(
+        currentSession?.access_token &&
+        !sessionExpired(currentSession)
+      );
+    }
   };
 })();
