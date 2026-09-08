@@ -146,9 +146,11 @@
     document.querySelector("[data-landing-home]")?.addEventListener("click", event => {
       event.preventDefault();
       goHome();
-      document.querySelector("#features")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  window.addEventListener("popstate", () => window.render?.());
 
   window.AppLanding = Object.freeze({
     view,
