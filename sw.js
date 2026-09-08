@@ -1,8 +1,9 @@
-const CACHE="orbit-bizassist-v6";
+const CACHE="orbit-bizassist-v7";
 const APP_SHELL=[
   "/",
   "/index.html",
   "/manifest.webmanifest",
+  "/favicon.svg",
   "/icon-192.svg",
   "/icon-512.svg",
   "/css/variables.css",
@@ -20,6 +21,8 @@ const APP_SHELL=[
   "/css/landing.css",
   "/css/orbit-visual.css",
   "/css/orbit-depth.css",
+  "/css/orbit-company.css",
+  "/css/orbit-motion.css",
   "/js/state.js",
   "/js/utils.js",
   "/js/compatibility.js",
@@ -41,7 +44,8 @@ const APP_SHELL=[
   "/js/ui.js",
   "/js/profile.js",
   "/js/app.js",
-  "/js/production-enhancements.js"
+  "/js/production-enhancements.js",
+  "/js/orbit-motion.js"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(
