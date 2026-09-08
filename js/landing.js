@@ -1,15 +1,21 @@
 /* =========================================================
-   ORBIT BIZASSIST — PUBLIC LANDING PAGE
-   First touchpoint before authentication.
+   ORBIT BIZASSIST — PUBLIC LANDING EXPERIENCE
+   Orbit East company page + BizAssist product introduction.
    ========================================================= */
 (() => {
   "use strict";
 
   const features = [
-    { icon: "▣", title: "Invoices", text: "Create clean, professional bills in seconds." },
-    { icon: "▤", title: "Inventory", text: "Know what is selling, low, or out of stock." },
-    { icon: "₹", title: "Khata", text: "Keep customer credit and payments organized." },
-    { icon: "◴", title: "Reports", text: "Turn everyday transactions into useful insight." }
+    { icon: "▣", title: "Invoices", text: "Create clean, professional bills and keep every transaction organized." },
+    { icon: "▤", title: "Inventory", text: "Track products, stock levels and movement without losing the bigger picture." },
+    { icon: "₹", title: "Khata & Payments", text: "Keep customer credit, payments and outstanding balances connected." },
+    { icon: "◴", title: "Reports", text: "Turn everyday business activity into a clearer view of what is happening." }
+  ];
+
+  const principles = [
+    ["01", "Useful by default", "Technology should remove steps, not add another layer of work."],
+    ["02", "Built to grow", "Start with the essentials and evolve into a deeper operating system over time."],
+    ["03", "Made with intent", "Every screen should feel deliberate, calm and easy to understand." ]
   ];
 
   const escapeHTML = value =>
@@ -43,11 +49,12 @@
     return new URLSearchParams(window.location.search).get("login") === "1";
   }
 
-  function featureCard(item) {
+  function featureCard(item, index) {
     return `
-      <article class="landing-feature-card">
+      <article class="landing-feature-card" style="--delay:${index * 70}ms">
         <span class="landing-feature-icon" aria-hidden="true">${item.icon}</span>
         <div>
+          <span class="landing-card-index">0${index + 1}</span>
           <h3>${escapeHTML(item.title)}</h3>
           <p>${escapeHTML(item.text)}</p>
         </div>
@@ -55,10 +62,25 @@
     `;
   }
 
-  function preview() {
+  function miniKpi(label, value, detail) {
+    return `<div class="landing-mini-kpi"><small>${escapeHTML(label)}</small><strong>${escapeHTML(value)}</strong><span>${escapeHTML(detail)}</span></div>`;
+  }
+
+  function productPreview() {
     return `
-      <div class="landing-preview" aria-label="Orbit BizAssist product preview">
-        <div class="landing-preview-glow" aria-hidden="true"></div>
+      <div class="landing-stage" aria-label="Orbit BizAssist product preview">
+        <div class="landing-orbit-ring landing-orbit-ring-a" aria-hidden="true"></div>
+        <div class="landing-orbit-ring landing-orbit-ring-b" aria-hidden="true"></div>
+        <div class="landing-stage-orb landing-stage-orb-a" aria-hidden="true"></div>
+        <div class="landing-stage-orb landing-stage-orb-b" aria-hidden="true"></div>
+
+        <div class="landing-product-card landing-product-back landing-float-one">
+          <span>INVENTORY</span><strong>07</strong><small>Low stock items</small>
+        </div>
+        <div class="landing-product-card landing-product-side landing-float-two">
+          <span>PAYMENTS</span><strong>₹18,420</strong><small>Collected today</small>
+        </div>
+
         <div class="landing-app-window">
           <div class="landing-window-top">
             <div class="landing-window-brand"><span class="brand-mark" aria-hidden="true">O</span><span>Orbit BizAssist</span></div>
@@ -66,26 +88,62 @@
           </div>
           <div class="landing-window-body">
             <aside class="landing-mini-sidebar" aria-hidden="true">
-              <span class="active"></span><span></span><span></span><span></span><span></span>
+              <span class="active"></span><span></span><span></span><span></span><span></span><span></span>
             </aside>
             <div class="landing-mini-content">
               <div class="landing-mini-heading">
-                <div><small>Overview</small><strong>Your business, in one place.</strong></div>
-                <span>Today</span>
+                <div><small>Overview</small><strong>Everything in motion.</strong></div>
+                <span>Live view</span>
               </div>
               <div class="landing-stat-row">
-                <div><small>Today's sales</small><strong>₹24,860</strong><em>+12.4%</em></div>
-                <div><small>Orders</small><strong>42</strong><em>8 pending</em></div>
-                <div><small>Low stock</small><strong>07</strong><em>Needs attention</em></div>
+                ${miniKpi("Today's sales", "₹24,860", "+12.4% today")}
+                ${miniKpi("Orders", "42", "Sales recorded")}
+                ${miniKpi("Inventory", "128", "Active products")}
               </div>
               <div class="landing-mini-grid">
-                <div class="landing-chart-card"><div class="mini-line"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><small>Sales activity</small></div>
-                <div class="landing-list-card"><div><b>Recent invoices</b><span>View all</span></div><p><i></i> INV-1042 <strong>₹2,480</strong></p><p><i></i> INV-1041 <strong>₹1,920</strong></p><p><i></i> INV-1040 <strong>₹760</strong></p></div>
+                <div class="landing-chart-card">
+                  <div class="landing-chart-head"><div><small>Sales activity</small><b>Steady movement</b></div><span>30 DAYS</span></div>
+                  <div class="mini-line" aria-hidden="true"><span style="height:24%"></span><span style="height:40%"></span><span style="height:34%"></span><span style="height:58%"></span><span style="height:51%"></span><span style="height:73%"></span><span style="height:66%"></span><span style="height:88%"></span></div>
+                </div>
+                <div class="landing-list-card">
+                  <div><b>Recent invoices</b><span>View all</span></div>
+                  <p><i></i><span>INV-1042</span><strong>₹2,480</strong></p>
+                  <p><i></i><span>INV-1041</span><strong>₹1,920</strong></p>
+                  <p><i></i><span>INV-1040</span><strong>₹760</strong></p>
+                  <p><i></i><span>INV-1039</span><strong>₹3,180</strong></p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    `;
+  }
+
+  function companySection() {
+    return `
+      <section class="landing-company-wrap" id="company">
+        <div class="landing-company-grid">
+          <article class="landing-company-card landing-company-main">
+            <span class="landing-kicker">Orbit East</span>
+            <h2>Software &amp; technology, built for real work.</h2>
+            <p>Orbit East is building a family of practical software products and digital solutions. Orbit BizAssist is one of those products—focused on making everyday business operations simpler, clearer and more connected.</p>
+            <div class="landing-principles">
+              ${principles.map(([n, title, text]) => `<div><span>${n}</span><strong>${escapeHTML(title)}</strong><p>${escapeHTML(text)}</p></div>`).join("")}
+            </div>
+          </article>
+          <article class="landing-company-card landing-contact-card" id="contact">
+            <span class="landing-kicker">Contact</span>
+            <h3>Talk to Orbit East.</h3>
+            <p>For product questions, feedback, support or business enquiries.</p>
+            <div class="landing-company-meta">
+              <div><span>Email</span><a href="mailto:support.orbiteast@gmail.com">support.orbiteast@gmail.com</a></div>
+              <div><span>Address</span><strong>Main Road, Ranjit Mansion, Golaghat</strong></div>
+              <div><span>Founder</span><strong>Nayanjyoti Ghosh</strong></div>
+            </div>
+          </article>
+        </div>
+      </section>
     `;
   }
 
@@ -95,42 +153,53 @@
         <nav class="landing-nav" aria-label="Public navigation">
           <a class="landing-brand" href="#dashboard" data-landing-home>
             <span class="brand-mark" aria-hidden="true">O</span>
-            <span><strong>Orbit BizAssist</strong><small>by Orbit East</small></span>
+            <span><strong>Orbit BizAssist</strong><small>Software by Orbit East</small></span>
           </a>
+          <div class="landing-nav-links">
+            <a href="#product">Product</a>
+            <a href="#company">Company</a>
+            <a href="#contact">Contact</a>
+          </div>
           <div class="landing-nav-actions">
-            <a href="#features">Features</a>
             <button class="landing-login-link" type="button" data-landing-login>Sign in</button>
+            <button class="landing-nav-cta" type="button" data-landing-login>Get started <span>→</span></button>
           </div>
         </nav>
 
-        <section class="landing-hero">
+        <section class="landing-hero" id="product">
           <div class="landing-hero-copy">
-            <span class="landing-kicker"><i></i> Business, without the busywork.</span>
-            <h1>Run the work.<br><span>See the whole business.</span></h1>
-            <p>Orbit BizAssist brings sales, invoices, inventory, customers, Khata and business reporting into one calm workspace.</p>
+            <span class="landing-kicker"><i></i> The business workspace from Orbit East</span>
+            <h1>Less admin.<br><span>More momentum.</span></h1>
+            <p>Orbit BizAssist brings sales, invoices, inventory, customers, Khata, payments, expenses and reporting into one focused workspace.</p>
             <div class="landing-hero-actions">
-              <button class="landing-primary" type="button" data-landing-login>Get started <span aria-hidden="true">→</span></button>
-              <a class="landing-secondary" href="#features">Explore features <span aria-hidden="true">↓</span></a>
+              <button class="landing-primary" type="button" data-landing-login>Start building your workspace <span aria-hidden="true">→</span></button>
+              <a class="landing-secondary" href="#features">See what is inside <span aria-hidden="true">↓</span></a>
             </div>
-            <div class="landing-trust-row"><span>✓ Simple workflow</span><span>✓ Cloud-connected</span><span>✓ Built for growing businesses</span></div>
+            <div class="landing-trust-row"><span>✓ One workspace</span><span>✓ Cloud-connected</span><span>✓ Designed to grow with the business</span></div>
           </div>
-          ${preview()}
+          ${productPreview()}
+        </section>
+
+        <section class="landing-marquee" aria-label="Product areas">
+          <div><span>SALES</span><b>×</b><span>INVOICING</span><b>×</b><span>INVENTORY</span><b>×</b><span>KHATA</span><b>×</b><span>PAYMENTS</span><b>×</b><span>REPORTS</span></div>
         </section>
 
         <section class="landing-features" id="features">
           <div class="landing-section-head">
-            <div><span class="landing-kicker">One workspace</span><h2>The essentials, finally working together.</h2></div>
-            <p>Start with the tools your business needs today. Add depth as you grow.</p>
+            <div><span class="landing-kicker">Inside BizAssist</span><h2>The essentials, connected instead of scattered.</h2></div>
+            <p>Start simple. Keep the data connected. Give the business one reliable place to work from.</p>
           </div>
           <div class="landing-feature-grid">${features.map(featureCard).join("")}</div>
         </section>
 
+        ${companySection()}
+
         <section class="landing-bottom-cta">
-          <div><span class="landing-kicker">Ready when you are.</span><h2>Give your business a cleaner way to work.</h2><p>Start with your workspace and keep everything in one place.</p></div>
+          <div><span class="landing-kicker">Ready when you are.</span><h2>Build a cleaner business workflow.</h2><p>Open your Orbit BizAssist workspace and get started.</p></div>
           <button class="landing-primary" type="button" data-landing-login>Continue with Google <span aria-hidden="true">→</span></button>
         </section>
 
-        <footer class="landing-footer"><span>© ${new Date().getFullYear()} Orbit East</span><span>Orbit BizAssist</span></footer>
+        <footer class="landing-footer"><span>© ${new Date().getFullYear()} Orbit East</span><span>Orbit BizAssist · Software &amp; Technology</span></footer>
       </main>
     `;
   }
@@ -151,12 +220,5 @@
   }
 
   window.addEventListener("popstate", () => window.render?.());
-
-  window.AppLanding = Object.freeze({
-    view,
-    bind,
-    goLogin,
-    goHome,
-    isLoginView
-  });
+  window.AppLanding = Object.freeze({ view, bind, goLogin, goHome, isLoginView });
 })();
