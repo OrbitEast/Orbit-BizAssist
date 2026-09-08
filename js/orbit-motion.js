@@ -5,9 +5,8 @@
 (() => {
   "use strict";
 
-  function addLandingOrbit() {
-    const page = document.querySelector(".landing-page");
-    if (!page || page.querySelector(".landing-orbit-signature")) return;
+  function addLandingOrbit(page) {
+    if (page.dataset.orbitSignature === "1") return;
 
     const orbit = document.createElement("div");
     orbit.className = "landing-orbit-signature";
@@ -23,10 +22,13 @@
     `;
 
     page.appendChild(orbit);
+    page.dataset.orbitSignature = "1";
   }
 
-  function setupRevealObserver() {
-    const targets = document.querySelectorAll(
+  function setupRevealObserver(page) {
+    if (page.dataset.orbitReveals === "1") return;
+
+    const targets = page.querySelectorAll(
       ".landing-section-head, .landing-feature-card, .landing-company-card, .landing-bottom-cta, .landing-footer"
     );
 
@@ -37,6 +39,8 @@
       }
     });
 
+    page.dataset.orbitReveals = "1";
+
     if (!targets.length) return;
 
     if (!("IntersectionObserver" in window)) {
@@ -44,30 +48,31 @@
       return;
     }
 
-    const observer = new IntersectionObserver(entries => {
+    const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add("orbit-visible");
-        observer.unobserve(entry.target);
+        revealObserver.unobserve(entry.target);
       });
     }, {
       threshold: 0.12,
       rootMargin: "0px 0px -8% 0px"
     });
 
-    targets.forEach(element => observer.observe(element));
+    targets.forEach(element => revealObserver.observe(element));
   }
 
   function enhance() {
-    if (!document.querySelector(".landing-page")) return;
-    addLandingOrbit();
-    setupRevealObserver();
+    const page = document.querySelector(".landing-page");
+    if (!page) return;
+    addLandingOrbit(page);
+    setupRevealObserver(page);
   }
 
-  const observer = new MutationObserver(() => enhance());
+  const mutationObserver = new MutationObserver(() => enhance());
   const start = () => {
     const root = document.querySelector("#app");
-    if (root) observer.observe(root, { childList: true, subtree: true });
+    if (root) mutationObserver.observe(root, { childList: true, subtree: true });
     enhance();
   };
 
