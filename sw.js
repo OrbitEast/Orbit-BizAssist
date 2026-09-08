@@ -1,4 +1,4 @@
-const CACHE="orbit-bizassist-v3";
+const CACHE="orbit-bizassist-v4";
 const APP_SHELL=[
   "/",
   "/index.html",
@@ -16,6 +16,7 @@ const APP_SHELL=[
   "/css/responsive.css",
   "/css/landing.css",
   "/css/orbit-visual.css",
+  "/css/orbit-depth.css",
   "/js/state.js",
   "/js/utils.js",
   "/js/compatibility.js",
