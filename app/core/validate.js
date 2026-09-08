@@ -1,4 +1,4 @@
-/* Orbit BizAssist V2 — small, dependency-free validation helpers */
+/* Orbit BizAssist — small, dependency-free validation helpers */
 (() => {
   "use strict";
 
@@ -25,8 +25,8 @@
     return number;
   };
 
-  window.OrbitV2 = window.OrbitV2 || {};
-  window.OrbitV2.validate = Object.freeze({
+  window.OrbitBizAssist = window.OrbitBizAssist || {};
+  window.OrbitBizAssist.validate = Object.freeze({
     required,
     positiveMoney,
     positiveInteger
