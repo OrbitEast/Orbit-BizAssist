@@ -1,169 +1,105 @@
 /* =========================================================
-   ORBIT BIZASSIST — EMERALD MONEY & GROWTH THEME
-   Warm white workspace with emerald navigation and accents.
-   Clean, premium and business-focused.
+   ORBIT BIZASSIST — ELECTRIC PRODUCT THEME
+   Bright, modern workspace with Orbit purple accents.
    ========================================================= */
 
 :root {
-  /* ---------- Emerald Brand ---------- */
-  --brand-50: #ecfdf5;
-  --brand-100: #d1fae5;
-  --brand-200: #a7f3d0;
-  --brand-300: #6ee7b7;
-  --brand-400: #34d399;
-  --brand-500: #10b981;
-  --brand-600: #059669;
-  --brand-700: #047857;
-  --brand-800: #065f46;
-  --brand-900: #064e3b;
+  --brand-50: #f5f1ff;
+  --brand-100: #ece5ff;
+  --brand-200: #ddceff;
+  --brand-300: #c4abff;
+  --brand-400: #a37aff;
+  --brand-500: #7a4dff;
+  --brand-600: #6840e8;
+  --brand-700: #5632c9;
+  --brand-800: #4427a6;
+  --brand-900: #321c7e;
 
-  /* ---------- Warm Financial Workspace ---------- */
-  --bg: #f6f7f4;
-  --surface: #fffefa;
-  --surface-soft: #fafbf8;
-  --surface-muted: #edf1ec;
-  --surface-dark: #12352b;
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-soft: #fbfaff;
+  --surface-muted: #f1eff8;
+  --surface-dark: #151120;
 
-  --text: #18231f;
-  --text-secondary: #52605a;
-  --text-muted: #718078;
-  --text-subtle: #98a39e;
+  --text: #171522;
+  --text-secondary: #57536b;
+  --text-muted: #77738a;
+  --text-subtle: #9d99ac;
 
-  --border: #dfe5e1;
-  --border-soft: #edf0ed;
-  --border-strong: #c8d2cc;
+  --border: #e7e3ef;
+  --border-soft: #eeeaf5;
+  --border-strong: #d9d2e8;
 
-  --info: #059669;
-  --info-soft: #ecfdf5;
+  --info: #5b63d8;
+  --info-soft: #eef0ff;
 
-  --focus-ring: 0 0 0 3px rgba(5, 150, 105, 0.16);
+  --focus-ring: 0 0 0 3px rgba(122, 77, 255, 0.18);
 
-  --gradient-brand: linear-gradient(135deg, #047857 0%, #10b981 100%);
-  --gradient-dark: linear-gradient(135deg, #063b2d 0%, #047857 60%, #10b981 100%);
+  --gradient-brand: linear-gradient(135deg, #6840e8 0%, #8b5cf6 50%, #ff57d6 100%);
+  --gradient-dark: linear-gradient(135deg, #12101b 0%, #29213f 58%, #5a3dbb 100%);
 }
 
-/* ---------- App workspace ---------- */
-body {
-  background: var(--bg);
-}
+body { background: var(--bg); }
 
-/* ---------- Emerald navigation ---------- */
 .sidebar {
-  background: linear-gradient(180deg, #073b2d 0%, #052e24 100%);
-  color: #c9e5d9;
-  border-right: 1px solid #04271e;
-  box-shadow: 3px 0 16px rgba(6, 78, 59, 0.10);
+  background: linear-gradient(180deg, #171322 0%, #100d19 100%);
+  color: #d9d2e8;
+  border-right: 1px solid rgba(255,255,255,.06);
+  box-shadow: 3px 0 22px rgba(30,20,55,.08);
 }
-
-.sidebar-brand {
-  color: #ffffff;
-}
-
-.nav-item {
-  color: #c2d9d0;
-}
-
-.nav-item span {
-  color: #8db6a7;
-}
-
-.nav-item:hover {
-  background: rgba(16, 185, 129, 0.12);
-  color: #ffffff;
-}
-
-.nav-item:hover span {
-  color: #6ee7b7;
-}
-
+.sidebar-brand { color: #ffffff; }
+.nav-item { color: #c3bbd3; }
+.nav-item span { color: #9188a5; }
+.nav-item:hover { background: rgba(139,92,246,.10); color: #ffffff; }
+.nav-item:hover span { color: #b99cff; }
 .nav-item.active {
-  background: rgba(16, 185, 129, 0.20);
+  background: linear-gradient(90deg, rgba(122,77,255,.18), rgba(255,87,214,.07));
   color: #ffffff;
-  box-shadow: inset 3px 0 0 #34d399;
+  box-shadow: inset 3px 0 0 #8b5cf6, 0 8px 24px rgba(70,42,145,.10);
 }
+.nav-item.active span { color: #c1a9ff; }
 
-.nav-item.active span {
-  color: #6ee7b7;
-}
-
-/* ---------- Topbar ---------- */
 .topbar {
-  background: rgba(255, 254, 250, 0.97);
+  background: rgba(255,255,255,.90);
   border-bottom-color: var(--border);
-  box-shadow: 0 1px 8px rgba(6, 78, 59, 0.035);
+  box-shadow: 0 1px 12px rgba(48,31,88,.045);
+  backdrop-filter: blur(16px);
 }
 
-/* ---------- Cards / panels ---------- */
-.metric-card,
-.panel {
+.metric-card, .panel {
   background: var(--surface);
   border-color: var(--border);
-  box-shadow: 0 2px 8px rgba(6, 78, 59, 0.035);
+  box-shadow: 0 3px 12px rgba(48,31,88,.045);
 }
-
 .metric-card:hover {
-  border-color: #a9d8c4;
-  box-shadow: 0 6px 16px rgba(6, 78, 59, 0.07);
+  border-color: #d3c4f2;
+  box-shadow: 0 12px 28px rgba(70,42,145,.09);
 }
 
 .welcome-card {
-  border-color: #bfe2d2;
+  border-color: #ded2f5;
   background:
-    radial-gradient(circle at 88% 18%, rgba(16, 185, 129, 0.13), transparent 28%),
-    linear-gradient(135deg, #effbf5 0%, #fffefa 72%);
-  box-shadow: 0 3px 12px rgba(6, 78, 59, 0.06);
+    radial-gradient(circle at 88% 18%, rgba(122,77,255,.13), transparent 30%),
+    radial-gradient(circle at 15% 95%, rgba(255,87,214,.07), transparent 32%),
+    linear-gradient(135deg, #f5f0ff 0%, #ffffff 72%);
+  box-shadow: 0 8px 26px rgba(70,42,145,.08);
 }
+.welcome-card::after { background: rgba(122,77,255,.05); }
 
-.welcome-card::after {
-  background: rgba(16, 185, 129, 0.06);
-}
+.primary-btn { background: var(--gradient-brand); box-shadow: 0 8px 20px rgba(122,77,255,.18); }
+.primary-btn:hover { background: var(--gradient-brand); box-shadow: 0 13px 30px rgba(122,77,255,.24); }
 
-/* ---------- Buttons ---------- */
-.primary-btn {
-  background: var(--brand-600);
-  box-shadow: 0 5px 14px rgba(5, 150, 105, 0.18);
-}
-
-.primary-btn:hover {
-  background: var(--brand-700);
-  box-shadow: 0 9px 22px rgba(5, 150, 105, 0.20);
-}
-
-/* ---------- Auth showcase ---------- */
 .auth-showcase {
   background:
-    radial-gradient(circle at 82% 18%, rgba(52, 211, 153, 0.20), transparent 28%),
-    radial-gradient(circle at 12% 82%, rgba(110, 231, 183, 0.12), transparent 30%),
-    linear-gradient(135deg, #063b2d 0%, #047857 55%, #059669 100%);
+    radial-gradient(circle at 82% 18%, rgba(255,87,214,.18), transparent 30%),
+    radial-gradient(circle at 12% 82%, rgba(139,92,246,.18), transparent 34%),
+    linear-gradient(135deg, #181224 0%, #30204f 52%, #6743bf 100%);
 }
+.auth-content .brand { color: #f0eaff; }
+.auth-hero .eyebrow { color: #c7b4ff; }
+.auth-hero h1 span { color: #e2d4ff; }
+.auth-showcase::before { background: rgba(139,92,246,.16); }
+.auth-showcase::after { background: rgba(255,87,214,.09); }
 
-.auth-content .brand {
-  color: #d1fae5;
-}
-
-.auth-hero .eyebrow {
-  color: #6ee7b7;
-}
-
-.auth-hero h1 span {
-  color: #6ee7b7;
-}
-
-.auth-showcase::before {
-  background: rgba(52, 211, 153, 0.18);
-}
-
-.auth-showcase::after {
-  background: rgba(110, 231, 183, 0.10);
-}
-
-/* ---------- Money-positive interaction states ---------- */
-.user-avatar {
-  background: var(--brand-100);
-  color: var(--brand-700);
-}
-
-::selection {
-  background: var(--brand-200);
-  color: var(--brand-900);
-}
+.user-avatar { background: var(--brand-100); color: var(--brand-700); }
+::selection { background: var(--brand-200); color: var(--brand-900); }
