@@ -1,1 +1,0 @@
-/* Settings module boundary. Settings rendering remains in legacy-runtime.js during migration. */

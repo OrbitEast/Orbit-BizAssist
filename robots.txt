@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://orbit-bizassist.orbiteast.workers.dev/sitemap.xml
