@@ -19,34 +19,6 @@
 
 Orbit BizAssist is being developed with **small shops, retailers and growing local businesses** in mind. The goal is to make essential business operations faster, clearer and easier to manage from a single web application.
 
-## Tech Stack
+## Hosting
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- Supabase / Google OAuth integration
-- Modular JavaScript architecture
-
-## Project Structure
-
-```text
-Orbit-BizAssist/
-├── css/          # UI styles and responsive layout
-├── js/           # App, auth, routing, state and storage logic
-├── modules/      # Business features such as invoices, inventory, Khata, POS and payments
-└── index.html    # Main application entry point
-```
-
-## Current Status
-
-🚧 **Active development**
-
-Orbit BizAssist is currently under development. Features and internal architecture may change as the application moves toward a more complete production-ready business platform.
-
-## Vision
-
-The long-term goal is to build a practical, modern and accessible business assistant that helps local businesses handle everyday operations with less manual work — while keeping the interface simple enough for non-technical users.
-
-## License
-
-License information will be added as the project reaches its release stage.
+The production frontend is deployed to **Firebase Hosting** through GitHub Actions. Supabase continues to provide authentication and cloud data services.
