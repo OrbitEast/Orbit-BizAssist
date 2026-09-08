@@ -2,25 +2,35 @@ async function bootstrap(){
   state.page=AppRouter.current();
 
   try{
+    const localState=window.AppStorage?.restore?.();
+
     const restored=await window.orbitCloud.init((remote,profile)=>{
       const base=window.AppState.initial();
-      const cloudState=(remote&&typeof remote==="object")?remote:{};
       const metadata=profile?.user_metadata||{};
-      const cloudUser=cloudState.user&&typeof cloudState.user==="object"?cloudState.user:{};
-      const businesses=Array.isArray(cloudState.businesses)&&cloudState.businesses.length
-        ? cloudState.businesses
+      const cloudState=(remote&&typeof remote==="object")?remote:{};
+      const storedLocal=(localState&&typeof localState==="object")?localState:{};
+      const localBelongsToUser=Boolean(
+        profile?.id &&
+        storedLocal?.user?.id &&
+        storedLocal.user.id===profile.id
+      );
+      const fallbackState=localBelongsToUser?storedLocal:{};
+      const resolvedState={...fallbackState,...cloudState};
+      const cloudUser=resolvedState.user&&typeof resolvedState.user==="object"?resolvedState.user:{};
+      const businesses=Array.isArray(resolvedState.businesses)&&resolvedState.businesses.length
+        ? resolvedState.businesses
         : base.businesses;
-      const requestedActive=cloudState.activeBusiness;
+      const requestedActive=resolvedState.activeBusiness;
       const activeBusiness=businesses.some(b=>b?.id===requestedActive)
         ? requestedActive
         : businesses[0]?.id||base.activeBusiness;
 
       state={
         ...base,
-        ...cloudState,
+        ...resolvedState,
         businesses,
         activeBusiness,
-        onboarding:cloudState.onboarding||{completed:false,step:1},
+        onboarding:resolvedState.onboarding||{completed:false,step:1},
         user:{
           id:profile?.id||cloudUser.id||null,
           name:cloudUser.name||metadata.full_name||metadata.name||profile?.email||"Google user",
