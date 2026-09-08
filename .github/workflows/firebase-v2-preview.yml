@@ -1,0 +1,25 @@
+name: Orbit BizAssist V2 Preview
+
+on:
+  push:
+    branches:
+      - v2-foundation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy V2 preview to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_BIZASSIST_APP }}
+          projectId: orbit-bizassist-app
+          channelId: v2-preview
