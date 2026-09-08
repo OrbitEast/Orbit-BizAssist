@@ -1299,7 +1299,55 @@
 
     const customer =
       selectedCustomer();
+    const creditAmount =
+      payments
+        .filter(payment =>
+          payment.method === "Credit"
+        )
+        .reduce(
+          (sum, payment) =>
+            sum + Number(payment.amount || 0),
+          0
+        );
 
+    if (
+      creditAmount > 0 &&
+      !customer
+    ) {
+      throw new Error(
+        "Select a customer for a credit sale."
+      );
+    }
+
+    if (
+      creditAmount > 0 &&
+      customer
+    ) {
+      const currentDue =
+        window.Khata?.outstanding?.(
+          customer.id
+        ) || 0;
+
+      const creditLimit =
+        Number(
+          customer.creditLimit || 0
+        );
+
+      if (
+        creditLimit > 0 &&
+        currentDue + creditAmount >
+          creditLimit
+      ) {
+        throw new Error(
+          `Credit limit exceeded. Available credit: ${money(
+            Math.max(
+              0,
+              creditLimit - currentDue
+            )
+          )}.`
+        );
+      }
+    }
 
     const invoice =
       window.InvoiceEngine
@@ -1321,6 +1369,56 @@
           discount:
             POS.discount
         });
+         const creditLedgerEntry =
+      creditAmount > 0 && customer
+        ? {
+            id:
+              `ledger-${Date.now()}-` +
+              Math.random()
+                .toString(36)
+                .slice(2, 8),
+
+            customerId:
+              customer.id,
+
+            businessId:
+              currentBusiness.id,
+
+            type:
+              "sale",
+
+            invoiceId:
+              invoice.id,
+
+            invoiceNumber:
+              invoice.number || "",
+
+            debit:
+              creditAmount,
+
+            credit:
+              0,
+
+            amount:
+              creditAmount,
+
+            dueDate:
+              window.Khata?.calculateDueDate?.(
+                customer.dueDays
+              ) || null,
+
+            notes:
+              POS.notes || "",
+
+            createdAt:
+              new Date().toISOString(),
+
+            createdBy:
+              window.AppState?.get?.()
+                ?.user?.name ||
+              "Owner / Admin"
+          }
+        : null;
 
 
     /*
