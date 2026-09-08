@@ -1,117 +1,121 @@
 /* =========================================================
    ORBIT BIZASSIST — BUSINESS BLUE THEME
-   White / light-grey foundation with deep-blue accents.
-   Designed for trust, stability and financial-software clarity.
+   Light-grey workspace with deep-blue navigation and accents.
+   Designed to feel structured, serious and finance-oriented.
    ========================================================= */
 
 :root {
   /* ---------- Deep Blue Brand ---------- */
-  --brand-50: #eff6ff;
-  --brand-100: #dbeafe;
-  --brand-200: #bfdbfe;
-  --brand-300: #93c5fd;
-  --brand-400: #60a5fa;
+  --brand-50: #eef5ff;
+  --brand-100: #dceaff;
+  --brand-200: #bfd7ff;
+  --brand-300: #91baff;
+  --brand-400: #5f95f5;
   --brand-500: #2563eb;
   --brand-600: #1d4ed8;
   --brand-700: #1e40af;
-  --brand-800: #1e3a8a;
-  --brand-900: #172554;
+  --brand-800: #17367f;
+  --brand-900: #102653;
 
-  /* ---------- Light Financial UI ---------- */
-  --bg: #f5f7fa;
+  /* ---------- Stronger Workspace Contrast ---------- */
+  --bg: #eef1f5;
   --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --surface-muted: #eef2f7;
-  --surface-dark: #0f1f3d;
+  --surface-soft: #f7f9fc;
+  --surface-muted: #e5eaf1;
+  --surface-dark: #0f2347;
 
   --text: #172033;
   --text-secondary: #4b5870;
   --text-muted: #6b778c;
   --text-subtle: #8d98aa;
 
-  --border: #dfe5ee;
-  --border-soft: #edf1f6;
-  --border-strong: #cbd4e1;
+  --border: #d6dde8;
+  --border-soft: #e7ebf1;
+  --border-strong: #bcc7d6;
 
   --info: #2563eb;
-  --info-soft: #eff6ff;
+  --info-soft: #eef5ff;
 
   --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
 
-  --gradient-brand: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-  --gradient-dark: linear-gradient(135deg, #10244a 0%, #173b78 55%, #2563eb 100%);
+  --gradient-brand: linear-gradient(135deg, #17367f 0%, #2563eb 100%);
+  --gradient-dark: linear-gradient(135deg, #0d1f40 0%, #17367f 58%, #1d4ed8 100%);
 }
 
-/* ---------- App surfaces ---------- */
+/* ---------- App workspace ---------- */
 body {
   background: var(--bg);
 }
 
-/* ---------- Sidebar: light, established-software navigation ---------- */
+/* ---------- Deep-blue navigation ---------- */
 .sidebar {
-  background: #ffffff;
-  color: var(--text-secondary);
-  border-right: 1px solid var(--border);
-  box-shadow: 2px 0 12px rgba(15, 31, 61, 0.035);
+  background: linear-gradient(180deg, #102653 0%, #0d1f40 100%);
+  color: #cbd8ef;
+  border-right: 1px solid #0b1a35;
+  box-shadow: 3px 0 16px rgba(15, 31, 61, 0.10);
 }
 
 .sidebar-brand {
-  color: var(--text);
+  color: #ffffff;
 }
 
 .nav-item {
-  color: #5b687d;
+  color: #c1cee3;
 }
 
 .nav-item span {
-  color: #8190a5;
+  color: #91a4c5;
 }
 
 .nav-item:hover {
-  background: #f1f5fb;
-  color: var(--brand-800);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
 .nav-item:hover span {
-  color: var(--brand-600);
+  color: #bfd7ff;
 }
 
 .nav-item.active {
-  background: #eaf2ff;
-  color: var(--brand-800);
-  box-shadow: inset 3px 0 0 var(--brand-600);
+  background: rgba(37, 99, 235, 0.28);
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 #5f95f5;
 }
 
 .nav-item.active span {
-  color: var(--brand-600);
+  color: #91baff;
 }
 
 /* ---------- Topbar ---------- */
 .topbar {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   border-bottom-color: var(--border);
+  box-shadow: 0 1px 8px rgba(15, 31, 61, 0.035);
 }
 
-/* ---------- Cards / panels ---------- */
+/* ---------- Cards / panels: white cards clearly sitting on grey workspace ---------- */
 .metric-card,
 .panel {
   background: #ffffff;
   border-color: var(--border);
+  box-shadow: 0 2px 8px rgba(15, 31, 61, 0.035);
 }
 
 .metric-card:hover {
-  border-color: #b9d0f5;
+  border-color: #b8cbed;
+  box-shadow: 0 6px 16px rgba(15, 31, 61, 0.06);
 }
 
 .welcome-card {
-  border-color: #d4e3f8;
+  border-color: #c7d8f4;
   background:
-    radial-gradient(circle at 88% 18%, rgba(37, 99, 235, 0.10), transparent 28%),
-    linear-gradient(135deg, #f4f8ff 0%, #ffffff 68%);
+    radial-gradient(circle at 88% 18%, rgba(37, 99, 235, 0.14), transparent 28%),
+    linear-gradient(135deg, #edf4ff 0%, #ffffff 72%);
+  box-shadow: 0 3px 12px rgba(30, 64, 175, 0.06);
 }
 
 .welcome-card::after {
-  background: rgba(37, 99, 235, 0.06);
+  background: rgba(37, 99, 235, 0.07);
 }
 
 /* ---------- Buttons ---------- */
@@ -125,7 +129,7 @@ body {
   box-shadow: 0 9px 22px rgba(29, 78, 216, 0.20);
 }
 
-/* ---------- Auth showcase: deep blue rather than purple/black ---------- */
+/* ---------- Auth showcase ---------- */
 .auth-showcase {
   background:
     radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.20), transparent 28%),
