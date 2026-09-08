@@ -1538,6 +1538,16 @@
         ...(currentBusiness.payments || []),
         ...paymentEntries
       ],
+             ledger:
+        creditLedgerEntry
+          ? [
+              ...(currentBusiness.ledger || []),
+              creditLedgerEntry
+            ]
+          : (
+              currentBusiness.ledger ||
+              []
+            ),
 
       updatedAt:
         new Date().toISOString()
