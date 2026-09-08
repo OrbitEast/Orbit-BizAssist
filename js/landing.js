@@ -35,6 +35,7 @@
     url.hash = "dashboard";
     window.history.pushState({}, "", url);
     window.render?.();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goHome() {
@@ -43,10 +44,17 @@
     url.hash = "dashboard";
     window.history.pushState({}, "", url);
     window.render?.();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function isLoginView() {
     return new URLSearchParams(window.location.search).get("login") === "1";
+  }
+
+  function scrollToId(id) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function featureCard(item, index) {
@@ -215,7 +223,15 @@
     document.querySelector("[data-landing-home]")?.addEventListener("click", event => {
       event.preventDefault();
       goHome();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.querySelectorAll(".landing-page a[href^=\"#\"]").forEach(link => {
+      link.addEventListener("click", event => {
+        const id = link.getAttribute("href")?.slice(1);
+        if (!id || id === "dashboard") return;
+        event.preventDefault();
+        scrollToId(id);
+      });
     });
   }
 
