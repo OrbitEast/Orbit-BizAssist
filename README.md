@@ -1,7 +1,1 @@
-# Orbit BizAssist
-
-**Orbit BizAssist** is an all-in-one café and small-business manager by **Orbit East**. Open `index.html` in a current browser to start.
-
-It works locally first: invoices, stock movements, Khata entries, expenses, contacts, reports, and multi-business data save in the current browser even with no connection. Use **Continue locally** on the sign-in screen if you are not ready to connect Supabase.
-
-To enable Supabase sign-in and cloud sync, run `supabase-schema.sql` once in the Supabase SQL Editor, then enable Email and Phone providers in the Supabase Authentication settings. See `CUSTOMIZE.md` for the files and settings you may safely change.
+Orbit-BizAssist is an intelligent business management and workflow automation platform engineered to streamline daily operations, administrative tasks, and client engagement. Designed to reduce manual overhead and enhance team productivity, it centralizes task tracking, data management, and operational communication into a single unified interface. By automating repetitive business processes and providing real-time visibility into day-to-day operations, Orbit-BizAssist helps growing enterprises scale seamlessly, improve decision-making accuracy, and maintain smooth organizational workflows.
