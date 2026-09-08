@@ -3,32 +3,32 @@
 
   <!-- Main Homepage -->
   <url>
-    <loc>https://orbiteast.github.io/Orbit-BizAssist/</loc>
-    <lastmod>2026-09-07</lastmod>
+    <loc>https://orbit-bizassist.orbiteast.workers.dev/</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- About Page -->
   <url>
-    <loc>https://orbiteast.github.io/Orbit-BizAssist/about.html</loc>
-    <lastmod>2026-09-07</lastmod>
+    <loc>https://orbit-bizassist.orbiteast.workers.dev/about.html</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Services Page -->
   <url>
-    <loc>https://orbiteast.github.io/Orbit-BizAssist/services.html</loc>
-    <lastmod>2026-09-07</lastmod>
+    <loc>https://orbit-bizassist.orbiteast.workers.dev/services.html</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Contact Page -->
   <url>
-    <loc>https://orbiteast.github.io/Orbit-BizAssist/contact.html</loc>
-    <lastmod>2026-09-07</lastmod>
+    <loc>https://orbit-bizassist.orbiteast.workers.dev/contact.html</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
