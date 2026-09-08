@@ -1,10 +1,10 @@
-/* Orbit BizAssist V2 — runtime configuration */
+/* Orbit BizAssist — runtime configuration */
 (() => {
   "use strict";
   const CONFIG = Object.freeze({
     appName: "Orbit BizAssist",
     companyName: "Orbit East",
-    version: "2.0.0-foundation",
+    version: "1.0.0",
     currency: "INR",
     routes: { home: "dashboard", login: "login", onboarding: "onboarding" }
   });
