@@ -218,19 +218,17 @@
     const route = activeRoute();
 
     if (
-      route === "dashboard" &&
-      typeof window.dashboard === "function"
-    ) {
-      return window.dashboard();
-    }
+  route === "invoices" &&
+  typeof window.POS?.view === "function"
+) {
+  const html = window.POS.view();
 
-    /*
-     * Future modules plug in here.
-     *
-     * Example:
-     * if (route === "invoices") return window.invoices();
-     */
+  setTimeout(() => {
+    window.POS.render();
+  }, 0);
 
+  return html;
+}
     return `
       <main class="page">
         <section class="empty-state">
