@@ -227,9 +227,19 @@
       page: "dashboard"
     });
 
-    const saveResult = window.AppState.save?.();
-    if (saveResult && typeof saveResult.then === "function") {
-      await saveResult;
+    /*
+     * Local state is updated synchronously inside AppState.save().
+     * Do not block the first dashboard render on Supabase network
+     * latency. Cloud sync continues in the background and AppState
+     * already handles/report sync failures safely.
+     */
+    try {
+      const savePromise = window.AppState.save?.();
+      if (savePromise && typeof savePromise.catch === "function") {
+        savePromise.catch(error => console.warn("Orbit BizAssist: background setup sync failed:", error));
+      }
+    } catch (error) {
+      console.warn("Orbit BizAssist: setup save failed:", error);
     }
 
     window.location.hash = "dashboard";
