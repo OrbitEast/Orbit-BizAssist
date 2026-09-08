@@ -9,26 +9,12 @@
     brand: "Orbit BizAssist",
     parentBrand: "Orbit East",
     tagline: "Simple tools for running your business.",
-
     defaultBusiness: "Orbit Café",
-
     currency: "INR",
     locale: "en-IN",
     taxRate: 5,
-
-    categories: [
-      "Beverages",
-      "Snacks",
-      "Bakery",
-      "Retail"
-    ]
+    categories: ["Beverages", "Snacks", "Bakery", "Retail"]
   });
-
-
-  /* =======================================================
-     SEED DATA
-     Used only when a brand-new workspace is created.
-     ======================================================= */
 
   const SEED_ITEMS = [
     ["Chai", "Beverages", 20, 8, "☕"],
@@ -38,253 +24,143 @@
     ["Brownie", "Bakery", 80, 6, "🍫"]
   ];
 
-
   function createSeedItems() {
     return SEED_ITEMS.map((item, index) => ({
       id: `item-${index + 1}`,
-
       name: item[0],
       category: item[1],
-
       selling: Number(item[2]),
       cost: Math.round(Number(item[2]) * 0.45),
-
       stock: Number(item[3]),
       threshold: 5,
-
       sku: `OB-${101 + index}`,
-
       icon: item[4],
-
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }));
   }
 
-
-  /* =======================================================
-     BUSINESS FACTORY
-     ======================================================= */
-
   function createBusiness(name = CONFIG.defaultBusiness) {
     const timestamp = Date.now();
-
     return {
       id: `biz-${timestamp}`,
-
       name,
       phone: "",
       email: "",
       address: "",
-
       gstin: "",
-
       currency: CONFIG.currency,
       locale: CONFIG.locale,
-
       taxRate: CONFIG.taxRate,
-
       items: createSeedItems(),
-
       invoices: [],
       contacts: [],
       ledger: [],
-
       expenses: [],
       stockLog: [],
-
-      staff: [
-        {
-          id: "owner",
-          name: "Owner",
-          role: "Owner / Admin"
-        }
-      ],
-
+      staff: [{ id: "owner", name: "Owner", role: "Owner / Admin" }],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
   }
 
-
-  /* =======================================================
-     INITIAL STATE
-     ======================================================= */
-
   function createInitialState() {
     const business = createBusiness();
-
     return {
       version: 1,
-
       businesses: [business],
-
       activeBusiness: business.id,
-
-      /*
-       * POS state
-       */
       cart: [],
       documentType: "Invoice",
       payment: "UPI",
-
-      discount: {
-        type: "flat",
-        value: 0
-      },
-
-      /*
-       * Authentication
-       */
+      discount: { type: "flat", value: 0 },
       user: null,
-
-      /*
-       * Router
-       */
       page: "dashboard",
-
-      /*
-       * UI state
-       * Kept separate so future modules can expand it
-       * without changing the main data model.
-       */
-      ui: {
-        sidebarOpen: false,
-        modalOpen: false,
-        loading: false
-      },
-
-      /*
-       * Future-ready application metadata.
-       */
-      meta: {
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+      ui: { sidebarOpen: false, modalOpen: false, loading: false },
+      meta: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
     };
   }
-
-
-  /* =======================================================
-     GLOBAL STATE
-     ======================================================= */
 
   let state = createInitialState();
 
-
-  /* =======================================================
-     BASIC HELPERS
-     ======================================================= */
-
-  function getState() {
-    return state;
-  }
-
+  function getState() { return state; }
 
   function setState(nextState) {
     if (!nextState || typeof nextState !== "object") {
-      console.error(
-        "Orbit BizAssist: invalid state update."
-      );
-
+      console.error("Orbit BizAssist: invalid state update.");
       return state;
     }
-
     state = nextState;
-
     return state;
   }
 
-
   function mergeState(patch) {
-    if (!patch || typeof patch !== "object") {
-      return state;
-    }
-
+    if (!patch || typeof patch !== "object") return state;
     state = {
       ...state,
       ...patch,
-      meta: {
-        ...(state.meta || {}),
-        updatedAt: new Date().toISOString()
-      }
+      meta: { ...(state.meta || {}), updatedAt: new Date().toISOString() }
     };
-
     return state;
   }
-
 
   function resetState() {
     state = createInitialState();
-
     return state;
   }
 
-
-  /* =======================================================
-     BUSINESS HELPERS
-     ======================================================= */
-
   function getBusiness(businessId = state.activeBusiness) {
-    return (
-      state.businesses?.find(
-        business => business.id === businessId
-      ) ||
-      state.businesses?.[0] ||
-      null
-    );
+    return state.businesses?.find(business => business.id === businessId) || state.businesses?.[0] || null;
   }
 
-
   function setActiveBusiness(businessId) {
-    const exists = state.businesses?.some(
-      business => business.id === businessId
-    );
-
-    if (!exists) {
-      return getBusiness();
-    }
-
+    const exists = state.businesses?.some(business => business.id === businessId);
+    if (!exists) return getBusiness();
     state = {
       ...state,
       activeBusiness: businessId,
       cart: [],
-      meta: {
-        ...(state.meta || {}),
-        updatedAt: new Date().toISOString()
-      }
+      meta: { ...(state.meta || {}), updatedAt: new Date().toISOString() }
     };
-
     return getBusiness();
   }
 
-
   function addBusiness(data = {}) {
     const business = {
-      ...createBusiness(
-        data.name || `Business ${state.businesses.length + 1}`
-      ),
+      ...createBusiness(data.name || `Business ${state.businesses.length + 1}`),
       ...data,
       id: data.id || `biz-${Date.now()}`
     };
-
     state = {
       ...state,
-      businesses: [
-        ...(state.businesses || []),
-        business
-      ],
+      businesses: [...(state.businesses || []), business],
       activeBusiness: business.id,
       cart: []
     };
-
     return business;
   }
 
+  /*
+   * Supports both the current API:
+   *   updateBusiness(patch)
+   * and the legacy API:
+   *   updateBusiness(businessId, patch)
+   *
+   * Keeping this compatibility here avoids wrapping the frozen AppState
+   * object in a Proxy, which causes strict ECMAScript invariant errors.
+   */
+  function updateBusiness(first = {}, second = null) {
+    let businessId = state.activeBusiness;
+    let patch = first;
 
-  function updateBusiness(patch = {}) {
-    const current = getBusiness();
+    if (typeof first === "string" && second && typeof second === "object") {
+      businessId = first;
+      patch = second;
+    }
 
+    if (!patch || typeof patch !== "object") return getBusiness(businessId);
+
+    const current = getBusiness(businessId);
     if (!current) return null;
 
     const updated = {
@@ -295,205 +171,76 @@
 
     state = {
       ...state,
-
-      businesses: state.businesses.map(
-        business =>
-          business.id === current.id
-            ? updated
-            : business
-      ),
-
-      meta: {
-        ...(state.meta || {}),
-        updatedAt: new Date().toISOString()
-      }
+      businesses: state.businesses.map(business => business.id === current.id ? updated : business),
+      meta: { ...(state.meta || {}), updatedAt: new Date().toISOString() }
     };
 
     return updated;
   }
 
+  function items() { return getBusiness()?.items || []; }
+  function invoices() { return getBusiness()?.invoices || []; }
+  function contacts() { return getBusiness()?.contacts || []; }
+  function expenses() { return getBusiness()?.expenses || []; }
+  function staff() { return getBusiness()?.staff || []; }
+  function ledger() { return getBusiness()?.ledger || []; }
 
-  /* =======================================================
-     DATA ACCESS
-     ======================================================= */
+  function save() {
+    const cloud = window.orbitCloud;
+    const snapshot = { ...state, cart: [] };
 
-  function items() {
-    return getBusiness()?.items || [];
-  }
+    try {
+      localStorage.setItem("orbit-bizassist-state", JSON.stringify(snapshot));
+    } catch (error) {
+      console.warn("Orbit BizAssist local save failed:", error);
+    }
 
+    if (!cloud || typeof cloud.save !== "function") return Promise.resolve(false);
 
-  function invoices() {
-    return getBusiness()?.invoices || [];
-  }
-
-
-  function contacts() {
-    return getBusiness()?.contacts || [];
-  }
-
-
-  function expenses() {
-    return getBusiness()?.expenses || [];
-  }
-
-
-  function staff() {
-    return getBusiness()?.staff || [];
-  }
-
-
-  function ledger() {
-    return getBusiness()?.ledger || [];
-  }
-
-
-  /* =======================================================
-     PERSISTENCE
-     ======================================================= */
-
-function save() {
-  const cloud = window.orbitCloud;
-
-  const snapshot = {
-    ...state,
-
-    // Cart is temporary UI state.
-    // Never restore an unfinished cart accidentally.
-    cart: []
-  };
-
-  // Always keep the latest state locally first.
-  try {
-    localStorage.setItem(
-      "orbit-bizassist-state",
-      JSON.stringify(snapshot)
-    );
-  } catch (error) {
-    console.warn(
-      "Orbit BizAssist local save failed:",
-      error
-    );
-  }
-
-  // Cloud is optional. Local-first remains functional offline.
-  if (
-    !cloud ||
-    typeof cloud.save !== "function"
-  ) {
-    return Promise.resolve(false);
-  }
-
-  return cloud
-    .save(snapshot)
-    .then(() => true)
-    .catch(error => {
-      console.error(
-        "Orbit BizAssist cloud save failed:",
-        error
-      );
-
-      if (
-        typeof window.toast === "function"
-      ) {
-        window.toast(
-          "Saved locally. Cloud sync failed."
-        );
-      }
-
+    return cloud.save(snapshot).then(() => true).catch(error => {
+      console.error("Orbit BizAssist cloud save failed:", error);
+      if (typeof window.toast === "function") window.toast("Saved locally. Cloud sync failed.");
       return false;
     });
-}
-
-
-  /* =======================================================
-     PUBLIC API
-     ======================================================= */
+  }
 
   window.AppState = Object.freeze({
     get: getState,
     set: setState,
     merge: mergeState,
     reset: resetState,
-
     initial: createInitialState,
-
     config: CONFIG,
-
     business: getBusiness,
     setActiveBusiness,
-
     addBusiness,
     updateBusiness,
-
     items,
     invoices,
     contacts,
     expenses,
     staff,
     ledger,
-
     save
   });
 
-
-  /*
-   * Backwards compatibility for modules that still
-   * expect a global `state` variable during migration.
-   */
   Object.defineProperty(window, "state", {
     configurable: true,
-
-    get() {
-      return state;
-    },
-
-    set(value) {
-      if (value && typeof value === "object") {
-        state = value;
-      }
-    }
+    get() { return state; },
+    set(value) { if (value && typeof value === "object") state = value; }
   });
 
-
-  /*
-   * Compatibility helpers.
-   * Existing/future modules can gradually move to
-   * AppUtils without breaking the application.
-   */
-
-  window.$ = window.$ || (
-    selector => document.querySelector(selector)
-  );
-
-  window.esc = window.esc || (
-    value =>
-      String(value ?? "")
-        .replace(/[&<>'"]/g, character => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          "'": "&#39;",
-          '"': "&quot;"
-        }[character]))
-  );
-
-  window.money = window.money || (
-    value => {
-      const business = getBusiness();
-
-      return new Intl.NumberFormat(
-        business?.locale || CONFIG.locale,
-        {
-          style: "currency",
-          currency:
-            business?.currency || CONFIG.currency,
-          maximumFractionDigits: 0
-        }
-      ).format(Number(value) || 0);
-    }
-  );
-
-  window.now = window.now || (
-    () => new Date().toISOString()
-  );
+  window.$ = window.$ || (selector => document.querySelector(selector));
+  window.esc = window.esc || (value => String(value ?? "").replace(/[&<>'"]/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+  }[character])));
+  window.money = window.money || (value => {
+    const business = getBusiness();
+    return new Intl.NumberFormat(business?.locale || CONFIG.locale, {
+      style: "currency",
+      currency: business?.currency || CONFIG.currency,
+      maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+  });
+  window.now = window.now || (() => new Date().toISOString());
 })();
