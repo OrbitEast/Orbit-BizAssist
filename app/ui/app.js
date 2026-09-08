@@ -2,7 +2,7 @@
   "use strict";
 
   const root = document.querySelector("#app");
-  const core = window.OrbitV2;
+  const core = window.OrbitBizAssist;
   if (!root || !core) return;
 
   const navGroups = [
@@ -95,42 +95,30 @@
     return `
       <div class="dashboard-page">
         <div class="page-heading">
-          <div>
-            <div class="eyebrow">Overview</div>
-            <h1>Your business, in orbit.</h1>
-            <p>A calm command centre for sales, money, customers and everything moving through your business.</p>
-          </div>
+          <div><div class="eyebrow">Overview</div><h1>Your business, in orbit.</h1><p>A calm command centre for sales, money, customers and everything moving through your business.</p></div>
           <button class="primary-button" type="button"><span>＋</span> Create invoice</button>
         </div>
-
         <section class="setup-banner">
           <div class="setup-orbit-art" aria-hidden="true"><span class="setup-core"></span><span class="setup-ring one"></span><span class="setup-ring two"></span><i>✦</i></div>
           <div class="setup-copy"><span class="setup-kicker">FIRST STEPS</span><h2>Set up your workspace</h2><p>Add your business details, tax preferences and document settings before your first transaction.</p></div>
           <button class="secondary-button" type="button">Open setup <span>→</span></button>
         </section>
-
         <section class="metrics-grid" aria-label="Business summary">
           ${metricCard("Sales", "No sales recorded yet", "↗")}
           ${metricCard("Outstanding", "No receivables yet", "₹")}
           ${metricCard("Expenses", "No expenses yet", "−")}
           ${metricCard("Stock value", "No inventory yet", "▣")}
         </section>
-
         <section class="dashboard-grid">
           <article class="dashboard-card chart-card">
             <div class="card-header"><div><span class="card-eyebrow">SALES</span><h3>Sales performance</h3></div><button class="ghost-button" type="button">This month⌄</button></div>
-            <div class="empty-chart">
-              <div class="chart-lines"><span></span><span></span><span></span><span></span></div>
-              <div class="chart-axis"><b>Week 1</b><b>Week 2</b><b>Week 3</b><b>Week 4</b></div>
-              <div class="chart-message"><div class="empty-icon">↗</div><strong>Your sales story starts here</strong><span>Record your first invoice to see performance trends.</span></div>
-            </div>
+            <div class="empty-chart"><div class="chart-lines"><span></span><span></span><span></span><span></span></div><div class="chart-axis"><b>Week 1</b><b>Week 2</b><b>Week 3</b><b>Week 4</b></div><div class="chart-message"><div class="empty-icon">↗</div><strong>Your sales story starts here</strong><span>Record your first invoice to see performance trends.</span></div></div>
           </article>
           <article class="dashboard-card activity-card">
             <div class="card-header"><div><span class="card-eyebrow">ACTIVITY</span><h3>Recent activity</h3></div><button class="ghost-link" type="button">View all →</button></div>
             <div class="activity-empty"><div class="empty-icon">◌</div><strong>Nothing here yet</strong><span>Your latest invoices, payments and business events will appear here.</span></div>
           </article>
         </section>
-
         <section class="quick-grid">
           <article class="dashboard-card quick-card"><div><span class="quick-icon">＋</span><strong>Create an invoice</strong><small>Send a professional bill in minutes.</small></div><span class="quick-arrow">→</span></article>
           <article class="dashboard-card quick-card"><div><span class="quick-icon">◫</span><strong>Add a product</strong><small>Start your inventory catalogue.</small></div><span class="quick-arrow">→</span></article>
@@ -140,17 +128,7 @@
   }
 
   function renderApp() {
-    root.innerHTML = `
-      <div class="app-frame">
-        ${sidebar()}
-        <div class="app-main">
-          ${topbar()}
-          <main class="app-content">
-            <div class="ambient-orbit" aria-hidden="true"><span class="ambient-core"></span><span class="ambient-ring ring-1"></span><span class="ambient-ring ring-2"></span><span class="ambient-ring ring-3"></span><i class="orbit-star">✦</i></div>
-            ${dashboard()}
-          </main>
-        </div>
-      </div>`;
+    root.innerHTML = `<div class="app-frame">${sidebar()}<div class="app-main">${topbar()}<main class="app-content"><div class="ambient-orbit" aria-hidden="true"><span class="ambient-core"></span><span class="ambient-ring ring-1"></span><span class="ambient-ring ring-2"></span><span class="ambient-ring ring-3"></span><i class="orbit-star">✦</i></div>${dashboard()}</main></div></div>`;
   }
 
   const start = () => {
@@ -158,8 +136,8 @@
       core.bootstrap?.start?.();
       renderApp();
     } catch (error) {
-      console.error("Orbit BizAssist V2 failed to start:", error);
-      root.innerHTML = `<main class="v2-error"><h1>Orbit BizAssist</h1><p>The application foundation could not start.</p></main>`;
+      console.error("Orbit BizAssist failed to start:", error);
+      root.innerHTML = `<main class="app-error"><h1>Orbit BizAssist</h1><p>The application foundation could not start.</p></main>`;
     }
   };
 
