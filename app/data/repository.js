@@ -1,4 +1,4 @@
-/* Orbit BizAssist V2 — repository abstraction
+/* Orbit BizAssist — repository abstraction
  * Keeps Supabase-specific persistence out of domain/UI code.
  */
 (() => {
@@ -13,7 +13,6 @@
 
   function createRepository(adapter) {
     assertAdapter(adapter);
-
     return Object.freeze({
       list: (filters = {}) => adapter.list(filters),
       get: id => adapter.get(id),
@@ -23,7 +22,7 @@
     });
   }
 
-  window.OrbitV2 = window.OrbitV2 || {};
-  window.OrbitV2.data = window.OrbitV2.data || {};
-  window.OrbitV2.data.createRepository = createRepository;
+  window.OrbitBizAssist = window.OrbitBizAssist || {};
+  window.OrbitBizAssist.data = window.OrbitBizAssist.data || {};
+  window.OrbitBizAssist.data.createRepository = createRepository;
 })();
