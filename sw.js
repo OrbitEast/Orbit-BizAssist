@@ -1,4 +1,4 @@
-const CACHE="orbit-bizassist-v4";
+const CACHE="orbit-bizassist-v5";
 const APP_SHELL=[
   "/",
   "/index.html",
