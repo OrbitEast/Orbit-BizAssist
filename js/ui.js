@@ -63,9 +63,29 @@
 
   function routeView() {
     const route = activeRoute();
-    if (route === "invoices" && typeof window.POS?.view === "function") { const html = window.POS.view(); setTimeout(() => window.POS.render(), 0); return html; }
-    if (route === "inventory" && typeof window.Inventory?.view === "function") { const html = window.Inventory.view(); setTimeout(() => window.Inventory.render(), 0); return html; }
-    if (route === "khata" && typeof window.Khata?.view === "function") { const html = window.Khata.view(); setTimeout(() => window.Khata.render(), 0); return html; }
+
+    if (route === "dashboard" && typeof window.dashboard === "function") {
+      return window.dashboard();
+    }
+
+    if (route === "invoices" && typeof window.POS?.view === "function") {
+      const html = window.POS.view();
+      setTimeout(() => window.POS.render(), 0);
+      return html;
+    }
+
+    if (route === "inventory" && typeof window.Inventory?.view === "function") {
+      const html = window.Inventory.view();
+      setTimeout(() => window.Inventory.render(), 0);
+      return html;
+    }
+
+    if (route === "khata" && typeof window.Khata?.view === "function") {
+      const html = window.Khata.view();
+      setTimeout(() => window.Khata.render(), 0);
+      return html;
+    }
+
     return `<main class="page"><section class="empty-state"><div class="empty-icon" aria-hidden="true">✦</div><h4>${escapeHTML(pageTitle(route))} is coming next</h4><p>This workspace is being built module by module. Your business data and authentication stay connected.</p><button class="primary-btn" type="button" data-route="dashboard">Back to Dashboard</button></section></main>`;
   }
 
@@ -94,6 +114,10 @@
 
     root.innerHTML = appShell();
     root.setAttribute("aria-busy", "false");
+
+    if (activeRoute() === "dashboard" && typeof window.dashboard === "function") {
+      // Dashboard is self-contained; render() is intentionally pure HTML generation.
+    }
   }
 
   function handleClick(event) {
