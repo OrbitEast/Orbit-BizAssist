@@ -1,24 +1,20 @@
-# Orbit BizAssist
+# Orbit BizAssist V2
 
-> A lightweight business management web app for everyday retail and small-business operations.
+Orbit BizAssist is being rebuilt by Orbit East as a complete business operating system.
 
-**Orbit BizAssist** brings core business workflows into one simple interface — sales, invoices, inventory, customer credit (Khata), expenses and payments — so day-to-day business management can stay organized without relying on multiple disconnected tools.
+This branch is a clean product foundation. Legacy feature modules, styling layers, browser-state architecture, and the previous Supabase JSON-state schema are intentionally removed from the V2 build surface.
 
-## What it does
+The new product will be developed around explicit domain models, transaction-safe services, permissions, repositories, and a dedicated UI layer.
 
-- 📊 **Dashboard** — quick visibility into business activity and sales.
-- 🧾 **Invoices** — create and manage invoices with automated billing calculations.
-- 📦 **Inventory** — track products and stock while keeping invoice-related stock changes consistent.
-- 📒 **Khata** — manage customer credit/debit records linked with business transactions.
-- 💰 **Payments** — support payment tracking and refunds.
-- 💸 **Expenses** — keep business expenses organized.
-- 🔐 **Authentication** — login flow designed for Supabase/Google authentication.
-- 🧭 **Single-page navigation** — dashboard and business modules work through a lightweight client-side router.
+Capability target: leading business-management software covering sales, quotations, invoicing, purchases, payments, receivables, expenses, inventory, reporting, accounting, GST/compliance workflows, staff permissions, automation, integrations, and more.
 
-## Built for
+Orbit will use its own interface, language, workflows, and brand identity rather than copying another product.
 
-Orbit BizAssist is being developed with **small shops, retailers and growing local businesses** in mind. The goal is to make essential business operations faster, clearer and easier to manage from a single web application.
+## Brand
+Orbit East — Software & Technology
+Founder: Nayanjyoti Ghosh
+Co-founder: Boby Ghosh
 
-## Hosting
-
-The production frontend is deployed to **Firebase Hosting** through GitHub Actions. Supabase continues to provide authentication and cloud data services.
+## Infrastructure
+Frontend hosting: Firebase Hosting
+Backend/auth/data: Supabase
