@@ -241,6 +241,18 @@
 
   return html;
 }
+     if (
+  route === "khata" &&
+  typeof window.Khata?.view === "function"
+) {
+  const html = window.Khata.view();
+
+  setTimeout(() => {
+    window.Khata.render();
+  }, 0);
+
+  return html;
+}
     return `
       <main class="page">
         <section class="empty-state">
