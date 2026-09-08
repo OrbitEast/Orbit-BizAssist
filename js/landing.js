@@ -146,8 +146,9 @@
             <p>For product questions, feedback, support or business enquiries.</p>
             <div class="landing-company-meta">
               <div><span>Email</span><a href="mailto:support.orbiteast@gmail.com">support.orbiteast@gmail.com</a></div>
-              <div><span>Address</span><strong>Main Road, Ranjit Mansion, Golaghat</strong></div>
+              <div><span>Address</span><strong class="landing-address-text">Main Road, Ranjit Mansion, Golaghat, Assam, India</strong></div>
               <div><span>Founder</span><strong>Nayanjyoti Ghosh</strong></div>
+              <div><span>Co-founder</span><strong>Boby Ghosh</strong></div>
             </div>
           </article>
         </div>
