@@ -1,53 +1,44 @@
 :root {
   /* ================================
-     ORBIT — DESIGN TOKENS
+     ORBIT — ELECTRIC DESIGN TOKENS
      ================================ */
 
-  /* ---------- Brand ---------- */
-  --brand-50: #f1f2ff;
-  --brand-100: #e6e7ff;
-  --brand-200: #cdd0ff;
-  --brand-300: #adb2ff;
-  --brand-400: #858cff;
-  --brand-500: #5d65ed;
-  --brand-600: #4c52d9;
-  --brand-700: #3e43bd;
-  --brand-800: #34389a;
-  --brand-900: #292d78;
+  --brand-50: #f5f1ff;
+  --brand-100: #ece4ff;
+  --brand-200: #dccbff;
+  --brand-300: #c3a8ff;
+  --brand-400: #a47aff;
+  --brand-500: #7a4dff;
+  --brand-600: #6840e8;
+  --brand-700: #5632c9;
+  --brand-800: #4427a6;
+  --brand-900: #321c7e;
 
-  /* ---------- Background ---------- */
-  --bg: #f6f7fb;
+  --bg: #f7f7fb;
   --surface: #ffffff;
-  --surface-soft: #fafbff;
-  --surface-muted: #f1f3f8;
-  --surface-dark: #0b0d17;
+  --surface-soft: #fbfaff;
+  --surface-muted: #f1eff8;
+  --surface-dark: #11101a;
 
-  /* ---------- Text ---------- */
-  --text: #151927;
-  --text-secondary: #4f5870;
-  --text-muted: #737c91;
-  --text-subtle: #9aa2b4;
+  --text: #171522;
+  --text-secondary: #57536b;
+  --text-muted: #77738a;
+  --text-subtle: #9d99ac;
   --text-inverse: #ffffff;
 
-  /* ---------- Borders ---------- */
-  --border: #e5e8f0;
-  --border-soft: #edf0f5;
-  --border-strong: #d4d9e5;
+  --border: #e7e3ef;
+  --border-soft: #eeeaf5;
+  --border-strong: #d9d2e8;
 
-  /* ---------- Semantic ---------- */
   --success: #16845d;
-  --success-soft: #eaf8f2;
-
+  --success-soft: #e9f8f1;
   --warning: #b96809;
   --warning-soft: #fff5e7;
-
   --danger: #c94444;
   --danger-soft: #fff0f0;
+  --info: #4b63d5;
+  --info-soft: #eef1ff;
 
-  --info: #3975c9;
-  --info-soft: #edf5ff;
-
-  /* ---------- Typography ---------- */
   --font-sans:
     "Inter",
     ui-sans-serif,
@@ -64,7 +55,6 @@
     Menlo,
     monospace;
 
-  /* ---------- Font Sizes ---------- */
   --text-xs: 0.6875rem;
   --text-sm: 0.8125rem;
   --text-md: 0.875rem;
@@ -75,20 +65,17 @@
   --text-4xl: 2.25rem;
   --text-5xl: 3.5rem;
 
-  /* ---------- Font Weights ---------- */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
   --weight-extrabold: 800;
 
-  /* ---------- Line Height ---------- */
   --leading-tight: 1.05;
   --leading-snug: 1.25;
   --leading-normal: 1.5;
   --leading-relaxed: 1.7;
 
-  /* ---------- Spacing ---------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -102,22 +89,19 @@
   --space-16: 64px;
   --space-20: 80px;
 
-  /* ---------- Radius ---------- */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 11px;
-  --radius-xl: 14px;
-  --radius-2xl: 18px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 15px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
   --radius-pill: 999px;
 
-  /* ---------- Shadows ---------- */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 4px 12px rgba(21, 27, 44, 0.06);
-  --shadow-md: 0 12px 30px rgba(21, 27, 44, 0.08);
-  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
-  --shadow-xl: 0 30px 80px rgba(10, 14, 28, 0.18);
+  --shadow-xs: 0 1px 2px rgba(36, 24, 74, 0.04);
+  --shadow-sm: 0 6px 18px rgba(41, 28, 92, 0.07);
+  --shadow-md: 0 16px 36px rgba(41, 28, 92, 0.10);
+  --shadow-lg: 0 24px 60px rgba(41, 28, 92, 0.14);
+  --shadow-xl: 0 34px 90px rgba(26, 16, 66, 0.20);
 
-  /* ---------- Motion ---------- */
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -127,12 +111,10 @@
   --duration-medium: 280ms;
   --duration-slow: 420ms;
 
-  /* ---------- Layout ---------- */
   --sidebar-width: 248px;
   --topbar-height: 72px;
   --content-max-width: 1480px;
 
-  /* ---------- Layers ---------- */
   --z-base: 0;
   --z-sidebar: 20;
   --z-header: 30;
@@ -142,22 +124,13 @@
   --z-toast: 300;
   --z-tooltip: 400;
 
-  /* ---------- Interaction ---------- */
-  --focus-ring:
-    0 0 0 3px rgba(93, 101, 237, 0.18);
+  --focus-ring: 0 0 0 3px rgba(122, 77, 255, 0.18);
 
-  /* ---------- Brand Gradient ---------- */
-  --gradient-brand:
-    linear-gradient(135deg, #5960eb 0%, #7b5ce1 100%);
-
-  --gradient-dark:
-    linear-gradient(135deg, #0b0d17 0%, #1b2040 55%, #34389a 100%);
+  --gradient-brand: linear-gradient(135deg, #6840e8 0%, #8b5cf6 48%, #ff4fd8 100%);
+  --gradient-brand-soft: linear-gradient(135deg, #f0eaff 0%, #faf6ff 58%, #fff 100%);
+  --gradient-dark: linear-gradient(135deg, #11101a 0%, #26203b 58%, #5a3dbb 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(122,77,255,.18), rgba(255,79,216,.14));
 }
-
-
-/* =================================
-   REDUCED MOTION
-   ================================= */
 
 @media (prefers-reduced-motion: reduce) {
   :root {
