@@ -229,6 +229,18 @@
 
   return html;
 }
+     if (
+  route === "inventory" &&
+  typeof window.Inventory?.view === "function"
+) {
+  const html = window.Inventory.view();
+
+  setTimeout(() => {
+    window.Inventory.render();
+  }, 0);
+
+  return html;
+}
     return `
       <main class="page">
         <section class="empty-state">
