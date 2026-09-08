@@ -21,7 +21,7 @@
   const escapeHTML = value =>
     window.AppUtils?.esc
       ? window.AppUtils.esc(value)
-      : String(value ?? "").replace(/[&<>'"]/g, char => ({
+      : String(value ?? "").replace(/[&<>'\"]/g, char => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
