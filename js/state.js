@@ -351,44 +351,58 @@
      PERSISTENCE
      ======================================================= */
 
-  function save() {
-    const cloud = window.orbitCloud;
+function save() {
+  const cloud = window.orbitCloud;
 
-    if (
-      !cloud ||
-      typeof cloud.push !== "function"
-    ) {
-      return Promise.resolve(false);
-    }
+  const snapshot = {
+    ...state,
 
-    const snapshot = {
-      ...state,
+    // Cart is temporary UI state.
+    // Never restore an unfinished cart accidentally.
+    cart: []
+  };
 
-      /*
-       * Cart is temporary UI state and should never
-       * accidentally be restored as an unfinished sale.
-       */
-      cart: []
-    };
-
-    return cloud
-      .push(snapshot)
-      .then(() => true)
-      .catch(error => {
-        console.error(
-          "Orbit BizAssist cloud save failed:",
-          error
-        );
-
-        if (typeof window.toast === "function") {
-          window.toast(
-            "Cloud save failed. Please try again."
-          );
-        }
-
-        return false;
-      });
+  // Always keep the latest state locally first.
+  try {
+    localStorage.setItem(
+      "orbit-bizassist-state",
+      JSON.stringify(snapshot)
+    );
+  } catch (error) {
+    console.warn(
+      "Orbit BizAssist local save failed:",
+      error
+    );
   }
+
+  // Cloud is optional. Local-first remains functional offline.
+  if (
+    !cloud ||
+    typeof cloud.save !== "function"
+  ) {
+    return Promise.resolve(false);
+  }
+
+  return cloud
+    .save(snapshot)
+    .then(() => true)
+    .catch(error => {
+      console.error(
+        "Orbit BizAssist cloud save failed:",
+        error
+      );
+
+      if (
+        typeof window.toast === "function"
+      ) {
+        window.toast(
+          "Saved locally. Cloud sync failed."
+        );
+      }
+
+      return false;
+    });
+}
 
 
   /* =======================================================
