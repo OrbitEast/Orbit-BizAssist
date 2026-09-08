@@ -1,7 +1,10 @@
-const CACHE="orbit-bizassist-v5";
+const CACHE="orbit-bizassist-v6";
 const APP_SHELL=[
   "/",
   "/index.html",
+  "/manifest.webmanifest",
+  "/icon-192.svg",
+  "/icon-512.svg",
   "/css/variables.css",
   "/css/base.css",
   "/css/layout.css",
