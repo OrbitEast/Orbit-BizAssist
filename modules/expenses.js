@@ -1,1 +1,0 @@
-/* Expenses module boundary. Expense rendering remains in legacy-runtime.js during migration. */
