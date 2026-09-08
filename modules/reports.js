@@ -1,1 +1,0 @@
-/* Reports module boundary. Report rendering remains in legacy-runtime.js during migration. */
