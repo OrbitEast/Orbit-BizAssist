@@ -8,6 +8,6 @@
     currency: "INR",
     routes: { home: "dashboard", login: "login", onboarding: "onboarding" }
   });
-  window.OrbitV2 = window.OrbitV2 || {};
-  window.OrbitV2.config = CONFIG;
+  window.OrbitBizAssist = window.OrbitBizAssist || {};
+  window.OrbitBizAssist.config = CONFIG;
 })();
