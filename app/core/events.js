@@ -1,4 +1,4 @@
-/* Orbit BizAssist V2 — explicit event bus */
+/* Orbit BizAssist — explicit event bus */
 (() => {
   "use strict";
 
@@ -20,6 +20,6 @@
     });
   }
 
-  window.OrbitV2 = window.OrbitV2 || {};
-  window.OrbitV2.events = Object.freeze({ on, emit });
+  window.OrbitBizAssist = window.OrbitBizAssist || {};
+  window.OrbitBizAssist.events = Object.freeze({ on, emit });
 })();
