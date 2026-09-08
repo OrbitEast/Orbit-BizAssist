@@ -1,1 +1,0 @@
-/* Staff module boundary. Staff rendering remains in legacy-runtime.js during migration. */
