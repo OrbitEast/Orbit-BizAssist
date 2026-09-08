@@ -1,0 +1,165 @@
+/* =========================================================
+   ORBIT BIZASSIST — BUSINESS BLUE THEME
+   White / light-grey foundation with deep-blue accents.
+   Designed for trust, stability and financial-software clarity.
+   ========================================================= */
+
+:root {
+  /* ---------- Deep Blue Brand ---------- */
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #2563eb;
+  --brand-600: #1d4ed8;
+  --brand-700: #1e40af;
+  --brand-800: #1e3a8a;
+  --brand-900: #172554;
+
+  /* ---------- Light Financial UI ---------- */
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-muted: #eef2f7;
+  --surface-dark: #0f1f3d;
+
+  --text: #172033;
+  --text-secondary: #4b5870;
+  --text-muted: #6b778c;
+  --text-subtle: #8d98aa;
+
+  --border: #dfe5ee;
+  --border-soft: #edf1f6;
+  --border-strong: #cbd4e1;
+
+  --info: #2563eb;
+  --info-soft: #eff6ff;
+
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
+
+  --gradient-brand: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  --gradient-dark: linear-gradient(135deg, #10244a 0%, #173b78 55%, #2563eb 100%);
+}
+
+/* ---------- App surfaces ---------- */
+body {
+  background: var(--bg);
+}
+
+/* ---------- Sidebar: light, established-software navigation ---------- */
+.sidebar {
+  background: #ffffff;
+  color: var(--text-secondary);
+  border-right: 1px solid var(--border);
+  box-shadow: 2px 0 12px rgba(15, 31, 61, 0.035);
+}
+
+.sidebar-brand {
+  color: var(--text);
+}
+
+.nav-item {
+  color: #5b687d;
+}
+
+.nav-item span {
+  color: #8190a5;
+}
+
+.nav-item:hover {
+  background: #f1f5fb;
+  color: var(--brand-800);
+}
+
+.nav-item:hover span {
+  color: var(--brand-600);
+}
+
+.nav-item.active {
+  background: #eaf2ff;
+  color: var(--brand-800);
+  box-shadow: inset 3px 0 0 var(--brand-600);
+}
+
+.nav-item.active span {
+  color: var(--brand-600);
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom-color: var(--border);
+}
+
+/* ---------- Cards / panels ---------- */
+.metric-card,
+.panel {
+  background: #ffffff;
+  border-color: var(--border);
+}
+
+.metric-card:hover {
+  border-color: #b9d0f5;
+}
+
+.welcome-card {
+  border-color: #d4e3f8;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(37, 99, 235, 0.10), transparent 28%),
+    linear-gradient(135deg, #f4f8ff 0%, #ffffff 68%);
+}
+
+.welcome-card::after {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+/* ---------- Buttons ---------- */
+.primary-btn {
+  background: var(--brand-600);
+  box-shadow: 0 5px 14px rgba(29, 78, 216, 0.18);
+}
+
+.primary-btn:hover {
+  background: var(--brand-700);
+  box-shadow: 0 9px 22px rgba(29, 78, 216, 0.20);
+}
+
+/* ---------- Auth showcase: deep blue rather than purple/black ---------- */
+.auth-showcase {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.20), transparent 28%),
+    radial-gradient(circle at 12% 82%, rgba(147, 197, 253, 0.12), transparent 30%),
+    linear-gradient(135deg, #10244a 0%, #173b78 52%, #1d4ed8 100%);
+}
+
+.auth-content .brand {
+  color: #dbeafe;
+}
+
+.auth-hero .eyebrow {
+  color: #93c5fd;
+}
+
+.auth-hero h1 span {
+  color: #93c5fd;
+}
+
+.auth-showcase::before {
+  background: rgba(96, 165, 250, 0.20);
+}
+
+.auth-showcase::after {
+  background: rgba(147, 197, 253, 0.12);
+}
+
+/* ---------- Small blue interaction states ---------- */
+.user-avatar {
+  background: var(--brand-100);
+  color: var(--brand-700);
+}
+
+::selection {
+  background: var(--brand-200);
+  color: var(--brand-900);
+}
