@@ -1,10 +1,13 @@
 /* Orbit BizAssist — compatibility bridge
  *
  * Legacy modules may call AppState.updateBusiness(id, patch).
- * That signature is now supported directly by state.js, so this file
- * intentionally does not replace or Proxy the frozen AppState object.
+ * That signature is implemented directly by state.js.
+ * This file only supplies safe browser compatibility helpers.
  */
 (() => {
   "use strict";
-  // Compatibility is implemented at the AppState API boundary.
+
+  if (typeof window.structuredClone !== "function") {
+    window.structuredClone = value => JSON.parse(JSON.stringify(value));
+  }
 })();
