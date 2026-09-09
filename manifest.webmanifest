@@ -1,6 +1,6 @@
 {
-  "name": "Orbit BizAssist",
-  "short_name": "BizAssist",
+  "name": "Orbit Biz",
+  "short_name": "Orbit Biz",
   "description": "Business operations software by Orbit East.",
   "start_url": "/?login=1#dashboard",
   "display": "standalone",
