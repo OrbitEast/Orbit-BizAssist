@@ -1,25 +1,25 @@
-/* Orbit BizAssist — bootstrap contract */
+/* OrbitBiz — bootstrap contract */
 (() => {
   "use strict";
 
   function assertCore() {
-    const core = window.OrbitBizAssist || {};
+    const core = window.OrbitBiz || {};
     const required = ["config", "store", "events", "models", "money", "validate", "permissions"];
     const missing = required.filter(key => !core[key]);
 
     if (missing.length) {
-      throw new Error(`Orbit BizAssist core incomplete: ${missing.join(", ")}`);
+      throw new Error(`OrbitBiz core incomplete: ${missing.join(", ")}`);
     }
   }
 
   function start() {
     assertCore();
-    window.OrbitBizAssist.events.emit("app:ready", {
-      version: window.OrbitBizAssist.config.version,
+    window.OrbitBiz.events.emit("app:ready", {
+      version: window.OrbitBiz.config.version,
       startedAt: new Date().toISOString()
     });
   }
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.bootstrap = Object.freeze({ start });
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.bootstrap = Object.freeze({ start });
 })();
