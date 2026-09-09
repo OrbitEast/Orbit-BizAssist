@@ -8,9 +8,9 @@
   "theme_color": "#111111",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "assets/orbit-east-logo.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
