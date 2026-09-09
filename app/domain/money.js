@@ -1,4 +1,4 @@
-/* Orbit BizAssist — integer-safe money helpers */
+/* Orbit Biz — integer-safe money helpers */
 (() => {
   "use strict";
 
@@ -14,6 +14,6 @@
   const multiply = (value, quantity) => fromCents(toCents(value) * Number(quantity));
   const percentage = (value, rate) => multiply(value, Number(rate) / 100);
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.money = Object.freeze({ toCents, fromCents, add, subtract, multiply, percentage });
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.money = Object.freeze({ toCents, fromCents, add, subtract, multiply, percentage });
 })();
