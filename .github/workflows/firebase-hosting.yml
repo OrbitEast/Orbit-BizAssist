@@ -22,4 +22,5 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_BIZASSIST_APP }}
           projectId: orbit-bizassist-app
+          firebaseHostingSite: orbitbiz
           channelId: live
