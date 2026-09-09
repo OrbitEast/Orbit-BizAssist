@@ -1,0 +1,9 @@
+/* Orbit East — exact uploaded master logo */
+.ob-brand-mark{width:150px;height:38px;display:block;object-fit:contain;object-position:left center;border-radius:0;background:transparent;box-shadow:none;flex:none}
+.ob-brand>span,.ob-brand>small{display:none}
+.ob-side-logo{font-size:0;gap:0}
+.ob-side-mark{width:112px;height:28px;display:block;object-fit:contain;object-position:left center;border-radius:0;background:transparent}
+.ob-auth-brand{gap:0}
+.ob-auth-brand img{width:170px;height:42px;object-fit:contain;object-position:left center;border-radius:0}
+.ob-auth-brand b,.ob-auth-brand small{display:none}
+@media(max-width:600px){.ob-brand-mark{width:132px;height:34px}.ob-auth-brand img{width:150px;height:38px}}
