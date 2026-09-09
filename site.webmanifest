@@ -1,0 +1,10 @@
+{
+  "name": "Orbit Biz",
+  "short_name": "Orbit Biz",
+  "description": "Business operating software by Orbit East for invoicing, inventory and everyday business operations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "icons": []
+}
