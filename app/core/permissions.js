@@ -1,4 +1,4 @@
-/* Orbit BizAssist — centralized permissions */
+/* Orbit Biz — centralized permissions */
 (() => {
   "use strict";
 
@@ -19,6 +19,6 @@
     }
   }
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.permissions = Object.freeze({ ROLE_LEVEL, REQUIREMENTS, can, assert });
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.permissions = Object.freeze({ ROLE_LEVEL, REQUIREMENTS, can, assert });
 })();
