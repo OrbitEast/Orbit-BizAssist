@@ -1,4 +1,4 @@
-/* Orbit BizAssist — repository abstraction
+/* Orbit Biz — repository abstraction
  * Keeps Supabase-specific persistence out of domain/UI code.
  */
 (() => {
@@ -22,7 +22,7 @@
     });
   }
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.data = window.OrbitBizAssist.data || {};
-  window.OrbitBizAssist.data.createRepository = createRepository;
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.data = window.OrbitBiz.data || {};
+  window.OrbitBiz.data.createRepository = createRepository;
 })();
