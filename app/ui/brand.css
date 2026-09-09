@@ -1,9 +1,28 @@
-/* Orbit East — exact uploaded master logo */
-.ob-brand-mark{width:150px;height:38px;display:block;object-fit:contain;object-position:left center;border-radius:0;background:transparent;box-shadow:none;flex:none}
+/* Orbit East / Orbit Biz — unified brand assets */
+.ob-brand-mark{width:150px;height:38px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none;flex:none}
 .ob-brand>span,.ob-brand>small{display:none}
-.ob-side-logo{font-size:0;gap:0}
-.ob-side-mark{width:112px;height:28px;display:block;object-fit:contain;object-position:left center;border-radius:0;background:transparent}
-.ob-auth-brand{gap:0}
-.ob-auth-brand img{width:170px;height:42px;object-fit:contain;object-position:left center;border-radius:0}
+
+.ob-side-logo{font-size:0;gap:0;display:flex;align-items:center}
+.ob-side-mark{width:128px;height:32px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none}
+
+.ob-auth-brand{gap:0;display:flex;align-items:center;justify-content:center}
+.ob-auth-brand img,.ob-auth-logo{width:180px;height:46px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ob-auth-brand b,.ob-auth-brand small{display:none}
-@media(max-width:600px){.ob-brand-mark{width:132px;height:34px}.ob-auth-brand img{width:150px;height:38px}}
+
+.ob-onboarding-brand{display:flex;align-items:center;justify-content:center;gap:0}
+.ob-onboarding-logo{width:190px;height:48px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
+.ob-onboarding-brand span,.ob-onboarding-brand b,.ob-onboarding-brand small{display:none}
+
+/* Workspace uses the master logo rather than the old letter-in-a-box mark. */
+.workspace-brand{display:flex;align-items:center;gap:10px;min-width:0}
+.workspace-logo{width:128px;height:36px;display:flex;align-items:center;justify-content:flex-start;flex:0 0 auto;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;color:inherit!important;font-size:0!important}
+.workspace-logo .ob-workspace-logo{width:128px;height:36px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none}
+.workspace-brand strong,.workspace-brand>span{display:none}
+
+@media(max-width:760px){
+  .ob-brand-mark{width:132px;height:34px}
+  .ob-side-mark{width:112px;height:28px}
+  .ob-auth-brand img,.ob-auth-logo{width:150px;height:38px}
+  .ob-onboarding-logo{width:160px;height:42px}
+  .workspace-logo,.workspace-logo .ob-workspace-logo{width:112px;height:32px}
+}
