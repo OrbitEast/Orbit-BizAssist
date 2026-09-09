@@ -5,7 +5,7 @@
   const core = window.OrbitBiz = window.OrbitBiz || {};
   const config = core.config?.supabase;
   let client = null;
-
+  let routing = false;
   const appRoot = () => document.querySelector("#app");
 
   function ensureClient() {
@@ -27,6 +27,7 @@
     if (!root) return;
     document.querySelector("#orbit-biz-landing")?.remove();
     document.querySelector(".ref-app")?.remove();
+    document.querySelector(".ob-onboarding")?.remove();
     const isSignup = mode === "signup";
     root.innerHTML = `<section class="ob-auth" aria-label="Orbit Biz authentication"><div class="ob-auth-card"><button class="ob-auth-brand" type="button" data-auth-back><span>O</span><b>Orbit</b><small>Biz</small></button><div class="ob-auth-label">${isSignup ? "GET STARTED" : "WELCOME BACK"}</div><h1>${isSignup ? "Create your Orbit Biz workspace." : "Sign in to Orbit Biz."}</h1><p>${isSignup ? "Start with your business and build your workspace from there." : "Continue to your business workspace."}</p><button class="ob-google-btn" type="button" data-google><span class="ob-google-g">G</span><span>Continue with Google</span></button>${error ? `<div class="ob-auth-error" role="alert">${escapeHtml(error)}</div>` : ""}<div class="ob-auth-divider"><span>Secure authentication</span></div><small class="ob-auth-note">Your account is secured by Supabase Auth. Orbit Biz never asks for your Google password.</small><button class="ob-auth-back" type="button" data-auth-back>← Back to Orbit Biz</button></div></section>`;
     root.querySelectorAll("[data-auth-back]").forEach(button => button.addEventListener("click", () => location.reload()));
@@ -37,10 +38,7 @@
     const button = document.querySelector("[data-google]");
     if (button) { button.disabled = true; button.textContent = "Connecting to Google…"; }
     try {
-      const { error } = await ensureClient().auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin + window.location.pathname }
-      });
+      const { error } = await ensureClient().auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + window.location.pathname } });
       if (error) throw error;
     } catch (error) {
       showAuth("signin", error?.message || "Google sign-in could not be started.");
@@ -48,18 +46,12 @@
   }
 
   async function resolveBusiness(user) {
-    const { data, error } = await ensureClient()
-      .from("business_members")
-      .select("business_id, role")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true })
-      .limit(1);
+    const { data, error } = await ensureClient().from("business_members").select("business_id, role").eq("user_id", user.id).order("created_at", { ascending: true }).limit(1);
     if (error) throw error;
-
     if (data?.[0]?.business_id) {
       core.activeBusinessId = data[0].business_id;
-      localStorage.setItem("orbitbiz.activeBusinessId", data[0].business_id);
       core.activeBusinessRole = data[0].role;
+      localStorage.setItem("orbitbiz.activeBusinessId", data[0].business_id);
       return true;
     }
     return false;
@@ -78,27 +70,26 @@
       showLanding();
       return;
     }
-
+    if (routing) return;
+    routing = true;
     core.auth.currentUser = session.user;
-    document.querySelector("#orbit-biz-landing")?.remove();
-    document.querySelector(".ob-auth")?.remove();
-
     try {
       const hasBusiness = await resolveBusiness(session.user);
+      document.querySelector("#orbit-biz-landing")?.remove();
+      document.querySelector(".ob-auth")?.remove();
       if (!hasBusiness) {
+        document.querySelector(".ref-app")?.remove();
         core.onboarding?.render();
-        return;
+      } else {
+        document.querySelector(".ob-onboarding")?.remove();
+        core.events?.emit("auth:ready", { user: session.user, session, businessId: core.activeBusinessId, role: core.activeBusinessRole });
       }
-      document.querySelector(".ob-onboarding")?.remove();
-      window.OrbitBiz.events?.emit("auth:ready", {
-        user: session.user,
-        session,
-        businessId: core.activeBusinessId,
-        role: core.activeBusinessRole
-      });
     } catch (error) {
       console.error("Orbit Biz business resolution failed:", error);
+      document.querySelector(".ref-app")?.remove();
       showAuth("signin", "We couldn't load your business workspace. Please refresh and try again.");
+    } finally {
+      routing = false;
     }
   }
 
@@ -108,27 +99,14 @@
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
       await handleSession(data.session);
-      supabase.auth.onAuthStateChange((_event, session) => {
-        void handleSession(session);
-      });
+      supabase.auth.onAuthStateChange((_event, session) => { void handleSession(session); });
     } catch (error) {
       console.error("Orbit Biz auth initialization failed:", error);
       showAuth("signin", "Authentication could not be initialized. Check the Supabase configuration.");
     }
   }
 
-  const api = {
-    signInWithGoogle,
-    getClient: ensureClient,
-    getSession: async () => (await ensureClient().auth.getSession()).data.session,
-    signOut: async () => {
-      localStorage.removeItem("orbitbiz.activeBusinessId");
-      core.activeBusinessId = null;
-      return ensureClient().auth.signOut();
-    },
-    currentUser: null
-  };
-
+  const api = { signInWithGoogle, getClient: ensureClient, getSession: async () => (await ensureClient().auth.getSession()).data.session, signOut: async () => { localStorage.removeItem("orbitbiz.activeBusinessId"); core.activeBusinessId = null; return ensureClient().auth.signOut(); }, currentUser: null };
   core.auth = api;
   window.addEventListener("orbitbiz:auth-request", event => showAuth(event.detail?.mode || "signin"));
   core.events?.on("auth:request", detail => showAuth(detail?.mode || "signin"));
