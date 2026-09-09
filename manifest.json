@@ -1,0 +1,17 @@
+{
+  "name": "Orbit Biz",
+  "short_name": "Orbit Biz",
+  "description": "Business operating software by Orbit East.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
