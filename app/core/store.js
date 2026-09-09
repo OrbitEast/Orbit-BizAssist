@@ -1,4 +1,4 @@
-/* Orbit BizAssist — normalized application store */
+/* Orbit Biz — normalized application store */
 (() => {
   "use strict";
 
@@ -63,8 +63,8 @@
     return () => listeners.delete(listener);
   }
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.store = Object.freeze({
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.store = Object.freeze({
     get: getState,
     snapshot: () => clone(state),
     replace,
