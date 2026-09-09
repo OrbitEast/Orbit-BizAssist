@@ -1,4 +1,4 @@
-/* Orbit BizAssist — transaction orchestration boundary */
+/* Orbit Biz — transaction orchestration boundary */
 (() => {
   "use strict";
 
@@ -28,7 +28,7 @@
     return Object.freeze({ recordSale });
   }
 
-  window.OrbitBizAssist = window.OrbitBizAssist || {};
-  window.OrbitBizAssist.services = window.OrbitBizAssist.services || {};
-  window.OrbitBizAssist.services.createTransactionEngine = createTransactionEngine;
+  window.OrbitBiz = window.OrbitBiz || {};
+  window.OrbitBiz.services = window.OrbitBiz.services || {};
+  window.OrbitBiz.services.createTransactionEngine = createTransactionEngine;
 })();
