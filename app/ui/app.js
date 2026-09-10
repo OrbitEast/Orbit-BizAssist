@@ -53,11 +53,14 @@
   }
 
   function handleClick(event) {
-    const customerRow = event.target.closest("[data-customer-open]");
+    const customerRow = event.target.closest("[data-customer-row]");
     if (customerRow && !event.target.closest("button")) {
-      event.preventDefault();
-      state.openCustomer(customerRow.dataset.id);
-      return;
+      const id = customerRow.querySelector('[data-action="edit-customer"]')?.dataset.id;
+      if (id) {
+        event.preventDefault();
+        state.openCustomer(id);
+        return;
+      }
     }
     const pageButton = event.target.closest("[data-page]");
     if (pageButton) {
