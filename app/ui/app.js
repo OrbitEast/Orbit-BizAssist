@@ -8,7 +8,9 @@
     businessId: localStorage.getItem("orbitbiz.activeBusinessId") || "",
     user: null,
     page: "dashboard",
-    navigate(page) { this.page = page; sync(); },
+    customerId: "",
+    navigate(page) { this.page = page; this.customerId = ""; sync(); },
+    openCustomer(id) { this.page = "customers"; this.customerId = id; sync(); },
     renderPage: () => renderPage()
   };
 
@@ -26,6 +28,8 @@
           w.safe(state, "payments", "id,amount,payment_date,created_at")
         ]);
         html = w.dashboardView({customers, items, invoices, payments});
+      } else if (state.page === "customers" && state.customerId) {
+        html = w.customerProfileView(await w.customerProfileData(state, state.customerId));
       } else if (state.page === "customers") {
         html = w.customersView(await w.safe(state, "customers"));
       } else if (state.page === "inventory") {
@@ -49,6 +53,12 @@
   }
 
   function handleClick(event) {
+    const customerRow = event.target.closest("[data-customer-open]");
+    if (customerRow && !event.target.closest("button")) {
+      event.preventDefault();
+      state.openCustomer(customerRow.dataset.id);
+      return;
+    }
     const pageButton = event.target.closest("[data-page]");
     if (pageButton) {
       event.preventDefault();
@@ -62,6 +72,7 @@
     else if (action === "quick-add") w.quickAdd(state);
     else if (action === "new-customer") w.newCustomer(state);
     else if (action === "edit-customer") w.editCustomer(state, actionButton.dataset.id);
+    else if (action === "back-customers") state.navigate("customers");
     else if (action === "new-item") w.newItem(state);
     else if (action === "quick-invoice") state.navigate("invoices");
     else if (action === "retry") renderPage();
