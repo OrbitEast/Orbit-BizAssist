@@ -1,22 +1,16 @@
-/* Orbit East — unified brand treatment */
-.ob-brand-mark{width:975px;height:270px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none;flex:none}
+/* Orbit East — unified, restrained brand treatment */
+.ob-brand-mark{width:34px;height:34px;display:block;object-fit:contain;object-position:center;border:0;border-radius:9px;background:transparent;box-shadow:none;flex:0 0 34px}
 .ob-brand>span,.ob-brand>small{display:none}
-.ob-side-logo{font-size:0;gap:0;display:flex;align-items:center;min-height:250px}
-.ob-side-mark{width:850px;height:225px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none}
-.ob-auth-brand{gap:0;display:flex;align-items:center;justify-content:center;min-height:310px}
-.ob-auth-brand img,.ob-auth-logo{width:1175px;height:310px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
+.ob-side-logo{font-size:0;gap:0;display:flex;align-items:center;min-height:24px;padding:0 9px 18px}
+.ob-side-mark{width:22px;height:22px;display:block;object-fit:contain;object-position:center;border:0;border-radius:6px;background:transparent;box-shadow:none}
+.ob-auth-brand{gap:0;display:flex;align-items:center;justify-content:center;min-height:72px}
+.ob-auth-brand img,.ob-auth-logo{width:240px;height:72px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ob-auth-brand b,.ob-auth-brand small{display:none}
-.ob-onboarding-brand{display:flex;align-items:center;justify-content:center;gap:0;min-height:310px}
-.ob-onboarding-logo{width:1175px;height:310px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
+.ob-onboarding-brand{display:flex;align-items:center;justify-content:center;gap:0;min-height:72px}
+.ob-onboarding-logo{width:240px;height:72px;display:block;object-fit:contain;object-position:center;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ob-onboarding-brand span,.ob-onboarding-brand b,.ob-onboarding-brand small{display:none}
-.workspace-brand{display:flex;align-items:center;gap:12px;min-width:0}
-.workspace-logo{width:850px;height:240px;display:flex;align-items:center;justify-content:flex-start;flex:0 0 auto;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;color:inherit!important;font-size:0!important}
-.workspace-logo .ob-workspace-logo{width:850px;height:240px;display:block;object-fit:contain;object-position:left center;border:0;border-radius:0;background:transparent;box-shadow:none}
-.workspace-brand strong,.workspace-brand>span{display:none}
-@media(max-width:760px){
-  .ob-brand-mark{width:825px;height:230px}
-  .ob-side-mark{width:740px;height:200px}
-  .ob-auth-brand img,.ob-auth-logo{width:1000px;height:270px}
-  .ob-onboarding-logo{width:1000px;height:270px}
-  .workspace-logo,.workspace-logo .ob-workspace-logo{width:740px;height:210px}
-}
+.workspace-brand{display:flex;align-items:center;gap:9px;min-width:0;max-width:210px;overflow:hidden}
+.workspace-logo{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex:0 0 28px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:7px!important;color:inherit!important;font-size:0!important;overflow:hidden}
+.workspace-logo .ob-workspace-logo{width:28px;height:28px;display:block;object-fit:contain;object-position:center;border:0;border-radius:7px;background:transparent;box-shadow:none}
+.workspace-brand strong{display:block;font-size:14px;line-height:1.1;letter-spacing:-.025em;white-space:nowrap}.workspace-brand>span{display:block;font-size:9px;line-height:1.1;color:#92909a;white-space:nowrap;margin-top:2px}
+@media(max-width:760px){.ob-brand-mark{width:30px;height:30px;flex-basis:30px}.ob-auth-brand img,.ob-auth-logo,.ob-onboarding-logo{width:190px;height:58px}.workspace-brand{max-width:42px}.workspace-brand strong,.workspace-brand>span{display:none}.workspace-logo,.workspace-logo .ob-workspace-logo{width:28px;height:28px}}
