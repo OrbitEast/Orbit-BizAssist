@@ -34,62 +34,155 @@
     const stage = root.querySelector("[data-companion-stage]");
     if (!companion || !stage || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
 
-    const state = { targetX: 0, targetY: 0, x: 0, y: 0, active: false, idle: null, frame: null, lastPointer: 0 };
-    const setTarget = (x, y) => { state.targetX = x; state.targetY = y; state.active = true; companion.classList.add("is-curious"); companion.classList.remove("is-sad", "is-running"); };
-    const runAway = () => {
+    const state = {
+      x: 0, y: 0, targetX: 0, targetY: 0,
+      mode: "idle", frame: null, idleTimer: null,
+      lastPointer: 0, lastBlink: performance.now() + 2600,
+      nextBlink: 3200 + Math.random() * 3000,
+      runToken: 0
+    };
+
+    const clearIdle = () => {
+      if (state.idleTimer) window.clearTimeout(state.idleTimer);
+      state.idleTimer = null;
+    };
+
+    const clampTarget = (x, y) => {
       const rect = stage.getBoundingClientRect();
-      const margin = 65;
-      const maxX = Math.max(margin, rect.width - margin);
-      const maxY = Math.max(150, rect.height - margin);
-      state.targetX = margin + Math.random() * Math.max(1, maxX - margin);
-      state.targetY = Math.min(maxY, Math.max(120, 150 + Math.random() * Math.max(1, maxY - 150)));
-      state.active = true;
-      companion.classList.remove("is-curious");
-      companion.classList.add("is-running");
-      companionTimers.push(window.setTimeout(() => companion.classList.remove("is-running"), 520));
+      const padX = Math.min(86, Math.max(58, rect.width * .11));
+      const top = Math.min(210, Math.max(125, rect.height * .25));
+      const bottom = Math.max(top + 80, rect.height - 72);
+      return {
+        x: Math.max(padX, Math.min(rect.width - padX, x)),
+        y: Math.max(top, Math.min(bottom, y))
+      };
     };
+
+    const setTarget = (x, y, mode = "curious") => {
+      const target = clampTarget(x, y);
+      state.targetX = target.x;
+      state.targetY = target.y;
+      state.mode = mode;
+      companion.classList.toggle("is-curious", mode === "curious");
+      companion.classList.toggle("is-running", mode === "running");
+      companion.classList.remove("is-sad");
+    };
+
+    const chooseRunTarget = () => {
+      const rect = stage.getBoundingClientRect();
+      const current = { x: state.x, y: state.y };
+      const candidates = [
+        { x: rect.width * .18, y: rect.height * .30 },
+        { x: rect.width * .78, y: rect.height * .31 },
+        { x: rect.width * .20, y: rect.height * .70 },
+        { x: rect.width * .78, y: rect.height * .67 },
+        { x: rect.width * .52, y: rect.height * .80 }
+      ].map(point => clampTarget(point.x, point.y));
+      candidates.sort((a, b) => {
+        const da = Math.hypot(a.x - current.x, a.y - current.y);
+        const db = Math.hypot(b.x - current.x, b.y - current.y);
+        return db - da;
+      });
+      return candidates[Math.floor(Math.random() * Math.min(3, candidates.length))];
+    };
+
+    const runAway = () => {
+      const target = chooseRunTarget();
+      state.runToken += 1;
+      const token = state.runToken;
+      setTarget(target.x, target.y, "running");
+      const distance = Math.hypot(target.x - state.x, target.y - state.y);
+      const duration = Math.max(1150, Math.min(1900, 1050 + distance * 1.15));
+      companionTimers.push(window.setTimeout(() => {
+        if (token !== state.runToken) return;
+        state.mode = "idle";
+        companion.classList.remove("is-running", "is-curious");
+      }, duration));
+    };
+
     const scheduleEscape = () => {
-      if (state.idle) window.clearTimeout(state.idle);
-      state.idle = window.setTimeout(() => { runAway(); state.idle = window.setTimeout(runAway, 900); }, 720);
+      clearIdle();
+      state.idleTimer = window.setTimeout(() => {
+        if (state.mode === "curious") runAway();
+      }, 1500);
     };
+
     const pointerMove = event => {
       if (event.pointerType === "touch") return;
       const now = performance.now();
-      if (now - state.lastPointer < 28) return;
+      if (now - state.lastPointer < 40) return;
       state.lastPointer = now;
       const rect = stage.getBoundingClientRect();
-      setTarget(Math.max(45, Math.min(rect.width - 45, event.clientX - rect.left)), Math.max(105, Math.min(rect.height - 45, event.clientY - rect.top)));
+      const px = event.clientX - rect.left;
+      const py = event.clientY - rect.top;
+      const companionDistance = Math.hypot(px - state.x, py - state.y);
+      if (companionDistance < 105) {
+        companion.classList.add("is-curious");
+      }
+      setTarget(px * .34 + state.x * .66, py * .34 + state.y * .66, "curious");
       scheduleEscape();
     };
-    const pointerLeave = () => { if (state.idle) window.clearTimeout(state.idle); state.idle = window.setTimeout(runAway, 280); };
+
+    const pointerLeave = () => {
+      clearIdle();
+      state.idleTimer = window.setTimeout(() => {
+        if (state.mode === "curious") runAway();
+      }, 900);
+    };
+
     const hurt = () => {
+      clearIdle();
+      state.mode = "sad";
       companion.classList.remove("is-curious", "is-running");
       void companion.offsetWidth;
       companion.classList.add("is-sad");
-      companionTimers.push(window.setTimeout(() => companion.classList.remove("is-sad"), 1450));
+      companionTimers.push(window.setTimeout(() => {
+        companion.classList.remove("is-sad");
+        state.mode = "idle";
+      }, 1500));
     };
-    const animate = () => {
+
+    const blink = now => {
+      if (now - state.lastBlink < state.nextBlink) return;
+      state.lastBlink = now;
+      state.nextBlink = 2600 + Math.random() * 4200;
+      companion.classList.add("is-blinking");
+      companionTimers.push(window.setTimeout(() => companion.classList.remove("is-blinking"), 150));
+    };
+
+    const animate = now => {
       const dx = state.targetX - state.x;
       const dy = state.targetY - state.y;
-      state.x += dx * (state.active ? .075 : .035);
-      state.y += dy * (state.active ? .075 : .035);
-      const angle = Math.max(-10, Math.min(10, dx * .055));
-      companion.style.transform = `translate3d(${state.x}px,${state.y}px,0) rotate(${angle}deg)`;
+      const distance = Math.hypot(dx, dy);
+      const speed = state.mode === "running" ? .045 : state.mode === "curious" ? .026 : .014;
+      state.x += dx * speed;
+      state.y += dy * speed;
+      const angle = Math.max(-7, Math.min(7, dx * .025));
+      const bob = state.mode === "idle" ? Math.sin(now / 850) * 1.6 : Math.sin(now / 170) * Math.min(2.2, distance * .015);
+      companion.style.transform = `translate3d(${state.x}px,${state.y + bob}px,0) rotate(${angle}deg)`;
+      companion.style.setProperty("--move-angle", `${angle}deg`);
+      blink(now);
       state.frame = requestAnimationFrame(animate);
     };
 
     const rect = stage.getBoundingClientRect();
-    state.x = rect.width * .74;
-    state.y = Math.min(rect.height - 70, Math.max(150, rect.height * .52));
+    state.x = rect.width * .72;
+    state.y = Math.min(rect.height - 80, Math.max(145, rect.height * .52));
     state.targetX = state.x;
     state.targetY = state.y;
     stage.addEventListener("pointermove", pointerMove, { passive: true });
     stage.addEventListener("pointerleave", pointerLeave, { passive: true });
     companion.addEventListener("click", hurt);
     companion.addEventListener("pointerdown", event => { if (event.pointerType !== "mouse") hurt(); }, { passive: true });
-    state.idle = window.setTimeout(runAway, 1600);
     state.frame = requestAnimationFrame(animate);
-    companionCleanup = () => { stage.removeEventListener("pointermove", pointerMove); stage.removeEventListener("pointerleave", pointerLeave); companion.removeEventListener("click", hurt); cancelAnimationFrame(state.frame); if (state.idle) window.clearTimeout(state.idle); };
+
+    companionCleanup = () => {
+      stage.removeEventListener("pointermove", pointerMove);
+      stage.removeEventListener("pointerleave", pointerLeave);
+      companion.removeEventListener("click", hurt);
+      cancelAnimationFrame(state.frame);
+      clearIdle();
+    };
   }
 
   function showAuth(mode = "signin", error = "") {
@@ -104,7 +197,7 @@
       <div class="ob-auth-art" data-companion-stage>
         <button class="ob-auth-brand" type="button" data-auth-back aria-label="Back to Orbit Biz"><img src="assets/orbiteastfavicon.png" alt="Orbit East"><b>Orbit</b><small>Biz</small></button>
         <div class="ob-auth-art-copy"><span class="ob-auth-kicker">Business, in one orbit</span><h2>Run it<br><em>your way.</em></h2><p>Customers, sales, inventory, finance and reports — one connected workspace designed to make everyday business simpler.</p></div>
-        <div class="ob-auth-companion-wrap"><div class="ob-auth-companion" data-companion role="img" aria-label="Mira, the Orbit companion"><div class="companion-shadow"></div><div class="companion-body"><i class="companion-ear left"></i><i class="companion-ear right"></i><i class="companion-eye left"></i><i class="companion-eye right"></i><i class="companion-mouth"></i><i class="companion-heart"></i></div></div><span class="ob-auth-companion-tip">Mira likes to chase your cursor.</span></div>
+        <div class="ob-auth-companion-wrap"><div class="ob-auth-companion" data-companion role="img" aria-label="Mira, the Orbit companion"><div class="companion-shadow"></div><div class="companion-body"><i class="companion-ear left"></i><i class="companion-ear right"></i><i class="companion-eye left"></i><i class="companion-eye right"></i><i class="companion-mouth"></i><i class="companion-heart"></i></div></div><span class="ob-auth-companion-tip">Mira is curious. Move your cursor.</span></div>
         <div class="ob-auth-stickers" aria-hidden="true"><span class="ob-auth-sticker">CRM</span><span class="ob-auth-sticker">INVENTORY</span><span class="ob-auth-sticker">FINANCE</span></div>
       </div>
       <div class="ob-auth-panel"><div class="ob-auth-card"><div class="ob-auth-label">${isSignup ? "GET STARTED" : "WELCOME BACK"}</div><h1>${isSignup ? "Create your workspace." : "Welcome back."}</h1><p>${isSignup ? "Start with your Google account. We’ll take you into business setup next." : "Sign in securely and continue to your business workspace."}</p><button class="ob-google-btn" type="button" data-google><span class="ob-google-g" aria-hidden="true">G</span><span>Continue with Google</span></button>${error ? `<div class="ob-auth-error" role="alert">${escapeHtml(error)}</div>` : ""}<div class="ob-auth-divider"><span>Secure sign-in</span></div><small class="ob-auth-note">Authentication is handled securely through your connected account. Your Google password is never shared with Orbit Biz.</small><button class="ob-auth-back" type="button" data-auth-back>← Back to Orbit Biz</button></div></div>
