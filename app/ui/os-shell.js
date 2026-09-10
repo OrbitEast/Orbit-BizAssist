@@ -1,0 +1,77 @@
+/* OrbitBiz — Business OS shell */
+(()=>{
+  "use strict";
+  const core=window.OrbitBiz=window.OrbitBiz||{};
+  const registry=[
+    {id:"dashboard",name:"Dashboard",group:"Core",icon:"◈",desc:"Live view of your business"},
+    {id:"invoices",name:"Sales & Invoices",group:"Sales",icon:"↗",desc:"Create invoices and track receivables"},
+    {id:"clients",name:"Customers",group:"Sales",icon:"◎",desc:"Customers and contacts"},
+    {id:"crm",name:"CRM",group:"Sales",icon:"⌁",desc:"Relationships and follow-ups"},
+    {id:"quotations",name:"Quotations",group:"Sales",icon:"▤",desc:"Prepare customer quotes"},
+    {id:"proforma",name:"Proforma",group:"Sales",icon:"▧",desc:"Commercial invoices"},
+    {id:"receipts",name:"Receipts",group:"Sales",icon:"▥",desc:"Customer payment receipts"},
+    {id:"items",name:"Inventory",group:"Operations",icon:"◇",desc:"Products, services and stock"},
+    {id:"stock",name:"Stock",group:"Operations",icon:"□",desc:"Inventory movements"},
+    {id:"warehouses",name:"Warehouses",group:"Operations",icon:"⌂",desc:"Stock locations"},
+    {id:"purchases",name:"Purchases",group:"Operations",icon:"↙",desc:"Supplier purchases"},
+    {id:"purchase-orders",name:"Purchase Orders",group:"Operations",icon:"▣",desc:"Orders to suppliers"},
+    {id:"vendor-payments",name:"Vendor Payments",group:"Finance",icon:"₹",desc:"Supplier payments"},
+    {id:"payment-accounts",name:"Payment Accounts",group:"Finance",icon:"▰",desc:"Cash and bank accounts"},
+    {id:"expenses",name:"Expenses",group:"Finance",icon:"−",desc:"Business expenses"},
+    {id:"reports",name:"Reports",group:"Insights",icon:"⌁",desc:"Business performance"},
+    {id:"gst",name:"GST",group:"Insights",icon:"%",desc:"GST-ready tax information"},
+    {id:"accounting-reports",name:"Accounting",group:"Insights",icon:"Σ",desc:"Financial statements"},
+    {id:"reconciliation",name:"Reconciliation",group:"Finance",icon:"⇄",desc:"Match transactions"}
+  ];
+  const key=()=>`orbitbiz.os.apps.${core.activeBusinessId||localStorage.getItem("orbitbiz.activeBusinessId")||"default"}`;
+  const defaults=()=>registry.map(x=>x.id);
+  const read=()=>{try{const v=JSON.parse(localStorage.getItem(key())||"null");return Array.isArray(v)&&v.length?v:defaults()}catch{return defaults()}};
+  const save=v=>localStorage.setItem(key(),JSON.stringify(v));
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+  let installed=read(), overlay=null, view="home";
+  const get=(id)=>registry.find(x=>x.id===id);
+  function appCard(a){return `<button class="orbit-os-app" data-os-open="${a.id}"><span class="orbit-os-app-icon">${a.icon}</span><span class="orbit-os-app-name">${esc(a.name)}</span><span class="orbit-os-app-desc">${esc(a.desc)}</span></button>`}
+  function home(){
+    const apps=registry.filter(a=>installed.includes(a.id));
+    const groups=["Core","Sales","Operations","Finance","Insights"];
+    return `<div class="orbit-os-screen"><div class="orbit-os-top"><div class="orbit-os-brand"><span class="orbit-os-mark">O</span><div><strong>OrbitBiz</strong><small>Business OS</small></div></div><div class="orbit-os-top-actions"><button class="orbit-os-search" data-os-search>⌘ <span>Search anything</span><kbd>⌘ K</kbd></button><button class="orbit-os-avatar" data-os-menu>${esc((core.auth?.currentUser?.email||"U")[0].toUpperCase())}</button></div></div><div class="orbit-os-body"><div class="orbit-os-welcome"><div><span class="orbit-os-eyebrow">YOUR WORKSPACE</span><h1>Everything your business needs.</h1><p>Open an app to get to work. Add or hide apps whenever your business changes.</p></div><button class="orbit-os-manage" data-os-manage>Manage apps <span>→</span></button></div><div class="orbit-os-grid-wrap">${groups.map(g=>{const items=apps.filter(a=>a.group===g);return items.length?`<section class="orbit-os-group"><div class="orbit-os-group-title">${g}</div><div class="orbit-os-grid">${items.map(appCard).join("")}</div></section>`:""}).join("")}</div></div><footer class="orbit-os-footer"><span>Orbit East</span><span>•</span><span>One workspace. One business database.</span><button data-os-workspace>Open workspace</button><button data-os-signout>Sign out</button></footer></div>`;
+  }
+  function manager(){
+    return `<div class="orbit-os-screen"><div class="orbit-os-top"><button class="orbit-os-back" data-os-home>←</button><div class="orbit-os-title"><strong>App library</strong><small>Choose the tools visible in your workspace</small></div><div></div></div><div class="orbit-os-manager"><div class="orbit-os-manager-head"><div><span class="orbit-os-eyebrow">ORBITBIZ APPS</span><h1>Build your own workspace.</h1><p>Keep only what your business actually uses. Your data stays shared between apps.</p></div><span class="orbit-os-count">${installed.length} / ${registry.length} active</span></div><div class="orbit-os-manager-list">${registry.map(a=>`<div class="orbit-os-manager-row"><span class="orbit-os-app-icon small">${a.icon}</span><div><strong>${esc(a.name)}</strong><p>${esc(a.desc)}</p></div><button class="orbit-os-toggle ${installed.includes(a.id)?"on":""}" data-os-toggle="${a.id}" aria-pressed="${installed.includes(a.id)}"><i></i><span>${installed.includes(a.id)?"Installed":"Install"}</span></button></div>`).join("")}</div></div></div>`;
+  }
+  function search(){
+    return `<div class="orbit-os-search-layer"><div class="orbit-os-search-backdrop" data-os-close></div><div class="orbit-os-search-box"><div class="orbit-os-search-input"><span>⌕</span><input autofocus placeholder="Search apps, customers, invoices…" data-os-query><kbd>ESC</kbd></div><div class="orbit-os-results" data-os-results>${registry.filter(a=>installed.includes(a.id)).slice(0,8).map(appCard).join("")}</div></div></div>`;
+  }
+  function mount(){
+    const root=document.getElementById("app"); if(!root) return;
+    if(!overlay){overlay=document.createElement("div");overlay.id="orbit-os";document.body.appendChild(overlay)}
+    overlay.className="orbit-os-overlay";overlay.innerHTML=view==="manager"?manager():home();
+    document.body.classList.add("orbit-os-active");
+    root.classList.add("orbit-os-underlay");
+    bind();
+  }
+  function bind(){
+    overlay.querySelectorAll("[data-os-open]").forEach(b=>b.onclick=()=>openApp(b.dataset.osOpen));
+    overlay.querySelector("[data-os-manage]")?.addEventListener("click",()=>{view="manager";mount()});
+    overlay.querySelector("[data-os-home]")?.addEventListener("click",()=>{view="home";mount()});
+    overlay.querySelector("[data-os-workspace]")?.addEventListener("click",()=>openApp("dashboard"));
+    overlay.querySelector("[data-os-signout]")?.addEventListener("click",()=>core.auth?.signOut?.());
+    overlay.querySelector("[data-os-menu]")?.addEventListener("click",()=>core.auth?.signOut?.());
+    overlay.querySelector("[data-os-search]")?.addEventListener("click",showSearch);
+    overlay.querySelectorAll("[data-os-toggle]").forEach(b=>b.onclick=()=>{const id=b.dataset.osToggle;if(id==="dashboard")return;installed=installed.includes(id)?installed.filter(x=>x!==id):[...installed,id];if(!installed.includes("dashboard"))installed.unshift("dashboard");save(installed);mount()});
+  }
+  function showSearch(){
+    const x=document.createElement("div");x.innerHTML=search();document.body.appendChild(x.firstElementChild);const layer=document.body.lastElementChild;const input=layer.querySelector("input");const results=layer.querySelector("[data-os-results]");
+    const run=()=>{const q=input.value.trim().toLowerCase();const hits=registry.filter(a=>installed.includes(a.id)&&(`${a.name} ${a.desc}`.toLowerCase().includes(q)));results.innerHTML=hits.length?hits.map(appCard).join(""):`<div class="orbit-os-no-results">No apps found.</div>`;results.querySelectorAll("[data-os-open]").forEach(b=>b.onclick=()=>{layer.remove();openApp(b.dataset.osOpen)})};
+    input.addEventListener("input",run);layer.querySelectorAll("[data-os-close]").forEach(b=>b.onclick=()=>layer.remove());input.addEventListener("keydown",e=>{if(e.key==="Escape")layer.remove()});setTimeout(()=>input.focus(),20);
+  }
+  function openApp(id){
+    const a=get(id);if(!a)return;
+    overlay?.remove();overlay=null;document.body.classList.remove("orbit-os-active");document.getElementById("app")?.classList.remove("orbit-os-underlay");
+    const button=document.querySelector(`.workspace-nav-item[data-page="${CSS.escape(id)}"]`);if(button)button.click();
+  }
+  function launcher(){view="home";mount()}
+  core.os={registry,openApp,launcher,showSearch,installed:()=>installed};
+  core.events?.on("auth:ready",()=>setTimeout(launcher,80));
+  document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(overlay)showSearch();else core.os?.showSearch?.()}});
+})();
