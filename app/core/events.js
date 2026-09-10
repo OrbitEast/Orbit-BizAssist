@@ -18,6 +18,7 @@
         console.error(`Orbit event ${eventName} failed:`, error);
       }
     });
+    window.dispatchEvent(new CustomEvent(eventName, { detail }));
   }
 
   window.OrbitBiz = window.OrbitBiz || {};
