@@ -1,4 +1,4 @@
-/* Orbit Biz — Supabase authentication */
+/* OrbitBiz — authentication and session routing */
 (() => {
   "use strict";
 
@@ -6,6 +6,7 @@
   const config = core.config?.supabase;
   let client = null;
   let routing = false;
+  let companionTimer = null;
   const appRoot = () => document.querySelector("#app");
 
   function ensureClient() {
@@ -22,7 +23,45 @@
     return String(value ?? "").replace(/[&<>\"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char]));
   }
 
+  function stopCompanion() {
+    if (companionTimer) window.clearTimeout(companionTimer);
+    companionTimer = null;
+  }
+
+  function wireCompanion(root) {
+    const companion = root.querySelector("[data-companion]");
+    if (!companion) return;
+    let lastMove = 0;
+    const react = (event) => {
+      const now = Date.now();
+      if (now - lastMove < 120) return;
+      lastMove = now;
+      const rect = companion.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / Math.max(rect.width, 1) - .5;
+      companion.style.setProperty("--look-x", `${Math.max(-1, Math.min(1, x)) * 9}deg`);
+      companion.classList.remove("is-startled", "is-sad");
+      void companion.offsetWidth;
+      companion.classList.add("is-startled");
+      window.clearTimeout(companionTimer);
+      companionTimer = window.setTimeout(() => companion.classList.remove("is-startled"), 420);
+    };
+    const hurt = () => {
+      companion.classList.remove("is-startled");
+      void companion.offsetWidth;
+      companion.classList.add("is-sad");
+      window.clearTimeout(companionTimer);
+      companionTimer = window.setTimeout(() => companion.classList.remove("is-sad"), 1450);
+    };
+    companion.addEventListener("pointermove", react, { passive: true });
+    companion.addEventListener("click", hurt);
+    companion.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") return;
+      hurt();
+    }, { passive: true });
+  }
+
   function showAuth(mode = "signin", error = "") {
+    stopCompanion();
     const root = appRoot();
     if (!root) return;
     document.querySelector("#orbit-biz-landing")?.remove();
@@ -32,29 +71,28 @@
     root.innerHTML = `<section class="ob-auth" aria-label="Orbit Biz authentication">
       <div class="ob-auth-art">
         <button class="ob-auth-brand" type="button" data-auth-back aria-label="Back to Orbit Biz">
-          <img src="assets/orbiteastfavicon.png" alt="Orbit East">
-          <b>Orbit</b><small>Biz</small>
+          <img src="assets/orbiteastfavicon.png" alt="Orbit East"><b>Orbit</b><small>Biz</small>
         </button>
         <div class="ob-auth-art-copy">
           <span class="ob-auth-kicker">Business, in one orbit</span>
           <h2>Run it<br><em>your way.</em></h2>
           <p>Customers, sales, inventory, finance and reports — one connected workspace designed to make everyday business simpler.</p>
         </div>
-        <div class="ob-auth-stickers" aria-hidden="true">
-          <span class="ob-auth-sticker">CRM</span>
-          <span class="ob-auth-sticker">INVENTORY</span>
-          <span class="ob-auth-sticker">FINANCE</span>
+        <div class="ob-auth-companion-wrap">
+          <div class="ob-auth-companion" data-companion role="img" aria-label="Orbit companion">
+            <div class="companion-shadow"></div>
+            <div class="companion-body"><i class="companion-ear left"></i><i class="companion-ear right"></i><i class="companion-eye left"></i><i class="companion-eye right"></i><i class="companion-mouth"></i><i class="companion-heart"></i></div>
+          </div>
+          <span class="ob-auth-companion-tip">Say hi. It notices your cursor.</span>
         </div>
+        <div class="ob-auth-stickers" aria-hidden="true"><span class="ob-auth-sticker">CRM</span><span class="ob-auth-sticker">INVENTORY</span><span class="ob-auth-sticker">FINANCE</span></div>
       </div>
       <div class="ob-auth-panel">
         <div class="ob-auth-card">
           <div class="ob-auth-label">${isSignup ? "GET STARTED" : "WELCOME BACK"}</div>
           <h1>${isSignup ? "Create your workspace." : "Welcome back."}</h1>
           <p>${isSignup ? "Start with your Google account. We’ll take you into business setup next." : "Sign in securely and continue to your business workspace."}</p>
-          <button class="ob-google-btn" type="button" data-google>
-            <span class="ob-google-g" aria-hidden="true">G</span>
-            <span>Continue with Google</span>
-          </button>
+          <button class="ob-google-btn" type="button" data-google><span class="ob-google-g" aria-hidden="true">G</span><span>Continue with Google</span></button>
           ${error ? `<div class="ob-auth-error" role="alert">${escapeHtml(error)}</div>` : ""}
           <div class="ob-auth-divider"><span>Secure sign-in</span></div>
           <small class="ob-auth-note">Authentication is handled securely through your connected account. Your Google password is never shared with Orbit Biz.</small>
@@ -64,11 +102,12 @@
     </section>`;
     root.querySelectorAll("[data-auth-back]").forEach(button => button.addEventListener("click", () => location.reload()));
     root.querySelector("[data-google]")?.addEventListener("click", signInWithGoogle);
+    wireCompanion(root);
   }
 
   async function signInWithGoogle() {
     const button = document.querySelector("[data-google]");
-    if (button) { button.disabled = true; button.textContent = "Connecting to Google…"; }
+    if (button) { button.disabled = true; button.innerHTML = "<span>Connecting to Google…</span>"; }
     try {
       const { error } = await ensureClient().auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + window.location.pathname } });
       if (error) throw error;
@@ -90,6 +129,7 @@
   }
 
   function showLanding() {
+    stopCompanion();
     document.querySelector(".ref-app")?.remove();
     document.querySelector(".ob-auth")?.remove();
     document.querySelector(".ob-onboarding")?.remove();
@@ -97,11 +137,7 @@
   }
 
   async function handleSession(session) {
-    if (!session?.user) {
-      core.auth.currentUser = null;
-      showLanding();
-      return;
-    }
+    if (!session?.user) { core.auth.currentUser = null; showLanding(); return; }
     if (routing) return;
     routing = true;
     core.auth.currentUser = session.user;
@@ -109,20 +145,13 @@
       const hasBusiness = await resolveBusiness(session.user);
       document.querySelector("#orbit-biz-landing")?.remove();
       document.querySelector(".ob-auth")?.remove();
-      if (!hasBusiness) {
-        document.querySelector(".ref-app")?.remove();
-        core.onboarding?.render();
-      } else {
-        document.querySelector(".ob-onboarding")?.remove();
-        core.events?.emit("auth:ready", { user: session.user, session, businessId: core.activeBusinessId, role: core.activeBusinessRole });
-      }
+      if (!hasBusiness) { document.querySelector(".ref-app")?.remove(); core.onboarding?.render(); }
+      else { document.querySelector(".ob-onboarding")?.remove(); core.events?.emit("auth:ready", { user: session.user, session, businessId: core.activeBusinessId, role: core.activeBusinessRole }); }
     } catch (error) {
       console.error("Orbit Biz business resolution failed:", error);
       document.querySelector(".ref-app")?.remove();
       showAuth("signin", "We couldn't load your business workspace. Please refresh and try again.");
-    } finally {
-      routing = false;
-    }
+    } finally { routing = false; }
   }
 
   async function init() {
