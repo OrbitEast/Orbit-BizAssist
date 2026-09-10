@@ -9,8 +9,9 @@
     user: null,
     page: "dashboard",
     customerId: "",
-    navigate(page) { this.page = page; this.customerId = ""; sync(); },
-    openCustomer(id) { this.page = "customers"; this.customerId = id; sync(); },
+    invoiceCustomerId: "",
+    navigate(page) { this.page = page; this.customerId = ""; this.invoiceCustomerId = ""; sync(); },
+    openCustomer(id) { this.page = "customers"; this.customerId = id; this.invoiceCustomerId = ""; sync(); },
     renderPage: () => renderPage()
   };
 
@@ -40,6 +41,11 @@
         html = w.genericView(state.page);
       }
       content.innerHTML = html;
+      if (state.page === "invoices" && state.invoiceCustomerId) {
+        const customerId = state.invoiceCustomerId;
+        state.invoiceCustomerId = "";
+        w.invoiceCreator(state, customerId);
+      }
     } catch (error) {
       console.error("OrbitBiz workspace render failed:", error);
       content.innerHTML = `<div class="ob-error"><div>${w.icon("spark")}</div><h3>Something interrupted this view.</h3><p>Your session is safe. Try again.</p><button class="ob-primary" data-action="retry">Try again</button></div>`;
@@ -56,11 +62,7 @@
     const customerRow = event.target.closest("[data-customer-row]");
     if (customerRow && !event.target.closest("button")) {
       const id = customerRow.querySelector('[data-action="edit-customer"]')?.dataset.id;
-      if (id) {
-        event.preventDefault();
-        state.openCustomer(id);
-        return;
-      }
+      if (id) { event.preventDefault(); state.openCustomer(id); return; }
     }
     const pageButton = event.target.closest("[data-page]");
     if (pageButton) {
@@ -77,7 +79,8 @@
     else if (action === "edit-customer") w.editCustomer(state, actionButton.dataset.id);
     else if (action === "back-customers") state.navigate("customers");
     else if (action === "new-item") w.newItem(state);
-    else if (action === "quick-invoice") state.navigate("invoices");
+    else if (action === "quick-invoice") { state.invoiceCustomerId = ""; state.navigate("invoices"); }
+    else if (action === "new-invoice-for-customer") { state.invoiceCustomerId = actionButton.dataset.id || ""; state.navigate("invoices"); }
     else if (action === "retry") renderPage();
     else if (action === "search") w.toast("Use the customer search field to filter your directory");
   }
