@@ -19,10 +19,13 @@
     if (!node) { node = document.createElement("div"); node.className = "ob-toast"; document.body.appendChild(node); }
     node.textContent = message;
     node.classList.add("show");
-    setTimeout(() => node.classList.remove("show"), 2200);
+    clearTimeout(w._toastTimer);
+    w._toastTimer = setTimeout(() => node.classList.remove("show"), 2200);
   };
 
-  w.field = (label, name, type="text", required=false) => `<label class="ob-field"><span>${label}</span><input name="${name}" type="${type}" ${required ? "required" : ""}></label>`;
+  w.escape = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+  w.field = (label, name, type="text", required=false, value="", placeholder="") => `<label class="ob-field"><span>${label}</span><input name="${name}" type="${type}" value="${w.escape(value)}" placeholder="${w.escape(placeholder)}" ${required ? "required" : ""}></label>`;
+  w.textarea = (label, name, value="", placeholder="") => `<label class="ob-field"><span>${label}</span><textarea name="${name}" rows="3" placeholder="${w.escape(placeholder)}">${w.escape(value)}</textarea></label>`;
 
   w.modal = (title, body) => {
     document.querySelector(".ob-modal")?.remove();
@@ -34,22 +37,49 @@
     return node;
   };
 
-  w.newCustomer = state => {
-    const node = w.modal("Add customer", `<form class="ob-form" data-form="customer">${w.field("Name","name","text",true)}${w.field("Company","company_name")}${w.field("Phone","phone","tel")}${w.field("Email","email","email")}<button class="ob-primary" type="submit">Save customer ${w.icon("arrow")}</button></form>`);
-    node.querySelector("form")?.addEventListener("submit", event => w.saveCustomer(event, state));
+  w.newCustomer = state => w.customerForm(state);
+
+  w.customerForm = (state, customer=null) => {
+    const editing = Boolean(customer?.id);
+    const node = w.modal(editing ? "Edit customer" : "Add customer", `<form class="ob-form" data-form="customer"><div class="ob-form-grid">${w.field("Name","name","text",true,customer?.name)}${w.field("Company","company_name","text",false,customer?.company_name)}${w.field("Phone","phone","tel",false,customer?.phone)}${w.field("Email","email","email",false,customer?.email)}${w.field("GSTIN","gstin","text",false,customer?.gstin)}${w.field("Credit limit","credit_limit","number",false,customer?.credit_limit)}${w.field("Opening balance","opening_balance","number",false,customer?.opening_balance)}</div>${w.textarea("Notes","notes",customer?.notes,"Optional notes about this customer")}<button class="ob-primary" type="submit">${editing ? "Save changes" : "Save customer"} ${w.icon("arrow")}</button></form>`);
+    node.querySelector("form")?.addEventListener("submit", event => w.saveCustomer(event, state, customer));
+    return node;
   };
-  w.saveCustomer = async (event, state) => {
+
+  w.saveCustomer = async (event, state, existing=null) => {
     event.preventDefault();
     const form = event.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
-    data.business_id = state.businessId;
+    const raw = Object.fromEntries(new FormData(form).entries());
+    const data = {
+      name: String(raw.name || "").trim(),
+      company_name: String(raw.company_name || "").trim() || null,
+      phone: String(raw.phone || "").trim() || null,
+      email: String(raw.email || "").trim() || null,
+      gstin: String(raw.gstin || "").trim() || null,
+      credit_limit: raw.credit_limit === "" ? null : Number(raw.credit_limit),
+      opening_balance: raw.opening_balance === "" ? 0 : Number(raw.opening_balance),
+      notes: String(raw.notes || "").trim() || null
+    };
+    if (!data.name) { w.toast("Customer name is required"); return; }
+    if (!Number.isFinite(data.opening_balance) || (data.credit_limit !== null && !Number.isFinite(data.credit_limit))) { w.toast("Enter valid amounts"); return; }
     try {
-      const result = await w.db().from("customers").insert(data);
+      const client = w.db();
+      if (!client) throw new Error("Database is not available");
+      const result = existing?.id
+        ? await client.from("customers").update(data).eq("id", existing.id).eq("business_id", state.businessId)
+        : await client.from("customers").insert({...data, business_id: state.businessId});
       if (result.error) throw result.error;
       form.closest(".ob-modal")?.remove();
-      w.toast("Customer added");
+      w.toast(existing?.id ? "Customer updated" : "Customer added");
       await state.renderPage();
-    } catch (error) { w.toast(error.message || "Could not save customer"); }
+    } catch (error) { console.error(error); w.toast(error.message || "Could not save customer"); }
+  };
+
+  w.editCustomer = async (state, id) => {
+    const rows = await w.safe(state, "customers");
+    const customer = rows.find(row => row.id === id);
+    if (!customer) { w.toast("Customer could not be found"); return; }
+    w.customerForm(state, customer);
   };
 
   w.newItem = state => {
