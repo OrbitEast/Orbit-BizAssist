@@ -10,8 +10,10 @@
     page: "dashboard",
     customerId: "",
     invoiceCustomerId: "",
-    navigate(page) { this.page = page; this.customerId = ""; this.invoiceCustomerId = ""; sync(); },
-    openCustomer(id) { this.page = "customers"; this.customerId = id; this.invoiceCustomerId = ""; sync(); },
+    invoiceId: "",
+    navigate(page) { this.page = page; this.customerId = ""; this.invoiceCustomerId = ""; this.invoiceId = ""; sync(); },
+    openCustomer(id) { this.page = "customers"; this.customerId = id; this.invoiceCustomerId = ""; this.invoiceId = ""; sync(); },
+    openInvoice(id) { this.page = "invoices"; this.invoiceId = id; this.invoiceCustomerId = ""; sync(); },
     renderPage: () => renderPage()
   };
 
@@ -35,6 +37,8 @@
         html = w.customersView(await w.safe(state, "customers"));
       } else if (state.page === "inventory") {
         html = w.inventoryView(await w.safe(state, "items"));
+      } else if (state.page === "invoices" && state.invoiceId) {
+        html = w.invoiceDetailView(await w.invoiceDetailData(state, state.invoiceId));
       } else if (state.page === "invoices") {
         html = w.invoicesView(await w.safe(state, "invoices"));
       } else {
@@ -58,11 +62,23 @@
     renderPage();
   }
 
+  async function openInvoiceFromRow(row) {
+    const number = row?.querySelector("td")?.textContent?.trim();
+    if (!number || !state.businessId) return;
+    const result = await w.db().from("invoices").select("id").eq("business_id", state.businessId).eq("invoice_number", number).maybeSingle();
+    if (result.error) { w.toast("Could not open invoice"); return; }
+    if (result.data?.id) state.openInvoice(result.data.id);
+  }
+
   function handleClick(event) {
     const customerRow = event.target.closest("[data-customer-row]");
     if (customerRow && !event.target.closest("button")) {
       const id = customerRow.querySelector('[data-action="edit-customer"]')?.dataset.id;
       if (id) { event.preventDefault(); state.openCustomer(id); return; }
+    }
+    if (state.page === "invoices" && !state.invoiceId) {
+      const invoiceRow = event.target.closest(".ob-table tbody tr");
+      if (invoiceRow && !event.target.closest("button")) { event.preventDefault(); openInvoiceFromRow(invoiceRow); return; }
     }
     const pageButton = event.target.closest("[data-page]");
     if (pageButton) {
@@ -78,9 +94,12 @@
     else if (action === "new-customer") w.newCustomer(state);
     else if (action === "edit-customer") w.editCustomer(state, actionButton.dataset.id);
     else if (action === "back-customers") state.navigate("customers");
+    else if (action === "back-invoices") state.navigate("invoices");
     else if (action === "new-item") w.newItem(state);
     else if (action === "quick-invoice") { state.invoiceCustomerId = ""; state.navigate("invoices"); }
     else if (action === "new-invoice-for-customer") { state.invoiceCustomerId = actionButton.dataset.id || ""; state.navigate("invoices"); }
+    else if (action === "record-payment" && state.invoiceId) w.invoiceDetailData(state,state.invoiceId).then(data => w.recordInvoicePayment(state,data)).catch(error => w.toast(error.message||"Could not load invoice"));
+    else if (action === "print-invoice") window.print();
     else if (action === "retry") renderPage();
     else if (action === "search") w.toast("Use the customer search field to filter your directory");
   }
