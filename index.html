@@ -19,8 +19,9 @@
   <meta property="og:site_name" content="Orbit Biz">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Orbit Biz — Business Management Software">
-  <meta name="twitter:description" content="Business management software for invoicing, inventory, expenses, payments and everyday operations.">
+  <meta name="twitter:description" content="Business management software for invoicing, inventory, expenses, payments and everyday business operations.">
   <title>Orbit Biz — Business Management Software | Orbit East</title>
+  <link rel="stylesheet" href="app/ui/boot-loader.css">
   <link rel="stylesheet" href="app/ui/styles.css">
   <link rel="stylesheet" href="app/ui/readability.css">
   <link rel="stylesheet" href="app/ui/landing.css">
@@ -45,7 +46,9 @@
   </script>
 </head>
 <body>
+  <div id="orbit-boot" aria-label="Loading Orbit Biz"><div class="orbit-boot-core"><i class="orbit-ring one"></i><i class="orbit-ring two"></i><i class="orbit-ring three"></i><i class="orbit-dot"></i><div class="orbit-boot-word">Orbit<span> Biz</span></div><div class="orbit-boot-label">Loading workspace</div></div></div>
   <main id="app" aria-live="polite"></main>
+  <script src="app/ui/boot-loader.js"></script>
   <script src="app/core/config.js"></script>
   <script src="app/core/events.js"></script>
   <script src="app/core/store.js"></script>
