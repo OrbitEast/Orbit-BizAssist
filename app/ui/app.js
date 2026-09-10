@@ -61,10 +61,25 @@
     if (action === "signout") core.auth?.signOut?.().then(() => location.reload());
     else if (action === "quick-add") w.quickAdd(state);
     else if (action === "new-customer") w.newCustomer(state);
+    else if (action === "edit-customer") w.editCustomer(state, actionButton.dataset.id);
     else if (action === "new-item") w.newItem(state);
     else if (action === "quick-invoice") state.navigate("invoices");
     else if (action === "retry") renderPage();
-    else if (action === "search") w.toast("Search will connect to your workspace records in the next pass");
+    else if (action === "search") w.toast("Use the customer search field to filter your directory");
+  }
+
+  function handleCustomerSearch(event) {
+    const input = event.target.closest("[data-customer-search]");
+    if (!input) return;
+    const query = input.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll("[data-customer-row]").forEach(row => {
+      const match = !query || row.dataset.search.includes(query);
+      row.hidden = !match;
+      if (match) visible += 1;
+    });
+    const counter = document.querySelector("[data-customer-count]");
+    if (counter) counter.textContent = `${visible} customer${visible === 1 ? "" : "s"}`;
   }
 
   function mount(detail = {}) {
@@ -78,6 +93,7 @@
   }
 
   document.addEventListener("click", handleClick);
+  document.addEventListener("input", handleCustomerSearch);
   core.events?.on("auth:ready", mount);
   window.addEventListener("auth:ready", event => mount(event.detail || {}));
   if (core.auth?.currentUser && state.businessId) mount({user: core.auth.currentUser, businessId: state.businessId});
