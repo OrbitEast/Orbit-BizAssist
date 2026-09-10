@@ -1,85 +1,84 @@
-/* OrbitBiz — modern workspace application */
+/* OrbitBiz workspace — application controller. Views, data and actions live in ./workspace/. */
 (() => {
   "use strict";
-
   const root = document.getElementById("app");
   const core = window.OrbitBiz = window.OrbitBiz || {};
-  const state = { businessId: localStorage.getItem("orbitbiz.activeBusinessId") || "", user: null, page: "dashboard" };
-
-  const icons = {
-    dashboard:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
-    customers:'<circle cx="9" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 8h5M19.5 5.5v5"/>',
-    crm:'<circle cx="8" cy="8" r="4"/><path d="M2 21a6 6 0 0 1 12 0M16 11h6M19 8v6"/>',
-    invoices:'<path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h4"/>',
-    quotations:'<path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
-    purchases:'<path d="M3 4h2l2 11h11l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>',
-    inventory:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 17l9 5 9-5"/>',
-    reports:'<path d="M4 19V5M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/>',
-    finance:'<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M7 15h4"/>',
-    settings:'<circle cx="12" cy="12" r="3"/><path d="M19 15.2a1.8 1.8 0 0 0 .3 2l.1.1-1.7 1.7-.1-.1a1.8 1.8 0 0 0-2-.3 1.8 1.8 0 0 0-1.1 1.6v.2h-2.4v-.2a1.8 1.8 0 0 0-1.1-1.6 1.8 1.8 0 0 0-2 .3l-.1.1-1.7-1.7.1-.1a1.8 1.8 0 0 0 .3-2 1.8 1.8 0 0 0-1.6-1H6v-2.4h.1a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0-.3-2l-.1-.1L9 6.7l.1.1a1.8 1.8 0 0 0 2 .3 1.8 1.8 0 0 0 1.1-1.6v-.2h2.4v.2a1.8 1.8 0 0 0 1.1 1.6 1.8 1.8 0 0 0 2-.3l.1-.1 1.7 1.7-.1.1a1.8 1.8 0 0 0-.3 2 1.8 1.8 0 0 0 1.6 1h.1v2.4h-.1a1.8 1.8 0 0 0-1.6 1Z"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>', search:'<circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>', spark:'<path d="m12 3 1.5 6.5L20 11l-6.5 1.5L12 19l-1.5-6.5L4 11l6.5-1.5L12 3Z"/>'
+  const w = core.workspace = core.workspace || {};
+  const state = {
+    businessId: localStorage.getItem("orbitbiz.activeBusinessId") || "",
+    user: null,
+    page: "dashboard",
+    navigate(page) { this.page = page; sync(); },
+    renderPage: () => renderPage()
   };
-  const nav = [
-    ["Overview", [["dashboard","Dashboard"]]],
-    ["Sell", [["crm","CRM"],["customers","Customers"],["quotations","Quotations"],["invoices","Invoices"]]],
-    ["Buy & stock", [["purchases","Purchases"],["inventory","Inventory"]]],
-    ["Money", [["finance","Finance"],["reports","Reports"]]],
-    ["Workspace", [["settings","Settings"]]]
-  ];
-  const meta = {
-    dashboard:["Dashboard","A clear view of what is happening across your business."], crm:["CRM","Keep relationships, follow-ups and opportunities organised."], customers:["Customers","Your customer directory and relationship records."], quotations:["Quotations","Prepare, track and convert customer quotes."], invoices:["Invoices","Create and follow your sales invoices."], purchases:["Purchases","Keep supplier purchases in one connected flow."], inventory:["Inventory","Products, stock levels and movement in one place."], finance:["Finance","Payments, balances and business money at a glance."], reports:["Reports","Turn business activity into useful numbers."], settings:["Settings","Business preferences and workspace controls."]
-  };
-  const esc = v => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-  const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[n]||icons.dashboard}</svg>`;
-  const money = v => `₹${Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})}`;
-  const db = () => core.auth?.getClient?.();
 
-  async function query(table, columns="*") {
-    const client = db();
-    if (!client || !state.businessId) return [];
-    const result = await client.from(table).select(columns).eq("business_id",state.businessId).order("created_at",{ascending:false}).limit(100);
-    if (result.error) throw result.error;
-    return result.data || [];
-  }
-  async function safe(table, columns="*") { try { return await query(table,columns); } catch (e) { console.warn(`OrbitBiz: ${table} unavailable`,e); return []; } }
-
-  function layout() {
-    const [title,desc] = meta[state.page];
-    const user = state.user || core.auth?.currentUser;
-    const name = user?.email?.split("@")[0] || "Workspace";
-    return `<div class="ob-workspace"><aside class="ob-sidebar"><div class="ob-side-brand"><div class="ob-side-mark">O</div><div><b>OrbitBiz</b><span>by Orbit East</span></div></div><div class="ob-side-business"><span>WORKSPACE</span><strong>${esc(name)}</strong><i>●</i></div><nav class="ob-nav">${nav.map(([label,items])=>`<div class="ob-nav-group"><small>${label}</small>${items.map(([key,text])=>`<button class="ob-nav-item ${state.page===key?"active":""}" data-page="${key}">${icon(key)}<span>${text}</span></button>`).join("")}</div>`).join("")}</nav><div class="ob-side-bottom"><button data-action="signout">${icon("arrow")} Sign out</button></div></aside><main class="ob-main"><header class="ob-topbar"><div class="ob-page-heading"><span>OrbitBiz / ${title}</span><h1>${title}</h1><p>${desc}</p></div><div class="ob-top-actions"><button class="ob-icon-btn" data-action="search" aria-label="Search">${icon("search")}</button><button class="ob-user-pill"><span>${esc(name.charAt(0).toUpperCase())}</span><b>${esc(name)}</b></button></div></header><div class="ob-content" id="workspace-content"><div class="ob-loading"><span></span><span></span><span></span></div></div></main></div>`;
-  }
-  function metric(label,value,note,tone,ic) { return `<article class="ob-metric ${tone}"><div class="ob-metric-top"><span>${label}</span><i>${icon(ic)}</i></div><strong>${value}</strong><small>${note}</small></article>`; }
-
-  async function dashboard() {
-    const [customers,items,invoices,payments] = await Promise.all([safe("customers","id,name,company_name,created_at"),safe("items","id,name,selling_price,opening_stock,created_at"),safe("invoices","id,invoice_number,total,amount_paid,status,created_at"),safe("payments","id,amount,payment_date,created_at")]);
-    const sales=invoices.reduce((a,r)=>a+Number(r.total||0),0), paid=invoices.reduce((a,r)=>a+Number(r.amount_paid||0),0), received=payments.reduce((a,r)=>a+Number(r.amount||0),0), outstanding=Math.max(0,sales-paid);
-    const recent=[...invoices].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,5);
-    return `<div class="ob-welcome"><div><span class="ob-eyebrow">TODAY'S OVERVIEW</span><h2>Everything important,<br><em>in one orbit.</em></h2><p>Track movement without digging through menus.</p></div><button class="ob-primary" data-action="quick-add">${icon("plus")} New transaction</button></div><section class="ob-metrics">${metric("Sales",money(sales),`${invoices.length} invoice${invoices.length===1?"":"s"}`,"yellow","finance")}${metric("Receivables",money(outstanding),"Still to collect","blue","invoices")}${metric("Received",money(received||paid),"Recorded payments","green","finance")}${metric("Customers",customers.length,`${items.length} items in catalogue`,"pink","customers")}</section><section class="ob-dashboard-grid"><article class="ob-panel ob-activity"><div class="ob-panel-head"><div><span>SALES FLOW</span><h3>Recent invoices</h3></div><button data-page="invoices">View all ${icon("arrow")}</button></div>${recent.length?`<div class="ob-list">${recent.map((x,i)=>`<div class="ob-list-row"><div class="ob-list-avatar tone-${i%4}">${esc((x.invoice_number||"INV").slice(0,2))}</div><div class="ob-list-main"><strong>${esc(x.invoice_number||"Invoice")}</strong><small>${esc(x.status||"Recorded")}</small></div><b>${money(x.total)}</b><span class="ob-status ${Number(x.amount_paid||0)>=Number(x.total||0)?"done":"open"}">${Number(x.amount_paid||0)>=Number(x.total||0)?"Paid":"Open"}</span></div>`).join("")}</div>`:`<div class="ob-empty"><div>${icon("invoices")}</div><h4>No invoices yet</h4><p>Create your first invoice and your sales flow will appear here.</p><button class="ob-soft" data-page="invoices">Create invoice ${icon("arrow")}</button></div>`}</article><article class="ob-panel ob-focus"><div class="ob-panel-head"><div><span>QUICK ACTIONS</span><h3>Keep moving</h3></div>${icon("spark")}</div><div class="ob-action-grid"><button data-action="new-customer"><i class="tone-pink">${icon("customers")}</i><b>Customer</b><small>Add a relationship</small></button><button data-action="quick-invoice"><i class="tone-yellow">${icon("invoices")}</i><b>Invoice</b><small>Record a sale</small></button><button data-page="inventory"><i class="tone-green">${icon("inventory")}</i><b>Stock</b><small>Check inventory</small></button><button data-page="reports"><i class="tone-blue">${icon("reports")}</i><b>Report</b><small>See performance</small></button></div></article></section>`;
+  async function renderPage() {
+    const content = document.getElementById("workspace-content");
+    if (!content) return;
+    content.innerHTML = `<div class="ob-loading"><span></span><span></span><span></span></div>`;
+    try {
+      let html;
+      if (state.page === "dashboard") {
+        const [customers, items, invoices, payments] = await Promise.all([
+          w.safe(state, "customers", "id,name,company_name,created_at"),
+          w.safe(state, "items", "id,name,selling_price,opening_stock,created_at"),
+          w.safe(state, "invoices", "id,invoice_number,total,amount_paid,status,created_at"),
+          w.safe(state, "payments", "id,amount,payment_date,created_at")
+        ]);
+        html = w.dashboardView({customers, items, invoices, payments});
+      } else if (state.page === "customers") {
+        html = w.customersView(await w.safe(state, "customers"));
+      } else if (state.page === "inventory") {
+        html = w.inventoryView(await w.safe(state, "items"));
+      } else if (state.page === "invoices") {
+        html = w.invoicesView(await w.safe(state, "invoices"));
+      } else {
+        html = w.genericView(state.page);
+      }
+      content.innerHTML = html;
+    } catch (error) {
+      console.error("OrbitBiz workspace render failed:", error);
+      content.innerHTML = `<div class="ob-error"><div>${w.icon("spark")}</div><h3>Something interrupted this view.</h3><p>Your session is safe. Try again.</p><button class="ob-primary" data-action="retry">Try again</button></div>`;
+    }
   }
 
-  function table(title,subtitle,rows,cols,emptyTitle,emptyText,action) {
-    return `<article class="ob-panel ob-full-panel"><div class="ob-panel-head"><div><span>${title.toUpperCase()}</span><h3>${subtitle}</h3></div><button class="ob-primary small" data-action="${action}">${icon("plus")} Add</button></div>${rows.length?`<div class="ob-table-scroll"><table class="ob-table"><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${typeof c[1]==="function"?c[1](r):esc(r[c[1]]||"—")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`:`<div class="ob-empty"><div>${icon(action==="new-customer"?"customers":action==="new-item"?"inventory":"invoices")}</div><h4>${emptyTitle}</h4><p>${emptyText}</p><button class="ob-soft" data-action="${action}">${icon("plus")} Get started</button></div>`}</article>`;
+  function sync() {
+    if (!root || !w.layout) return;
+    root.innerHTML = w.layout(state);
+    renderPage();
   }
-  async function customersPage(){const rows=await safe("customers");return table("Directory",`${rows.length} customer${rows.length===1?"":"s"}`,rows,[["Name",r=>`<strong>${esc(r.name)}</strong>`],["Company",r=>esc(r.company_name)],["Phone",r=>esc(r.phone)],["Email",r=>esc(r.email)],["Status",()=>`<span class="ob-status done">Active</span>`]],"No customers yet","Add a customer to start building your business directory.","new-customer");}
-  async function inventoryPage(){const rows=await safe("items");return table("Catalogue",`${rows.length} item${rows.length===1?"":"s"}`,rows,[["Item",r=>`<strong>${esc(r.name)}</strong>`],["SKU","sku"],["Type","item_type"],["Sale price",r=>money(r.selling_price)],["Stock",r=>Number(r.opening_stock||0)]],"Your catalogue is empty","Add products or services so sales and stock can connect.","new-item");}
-  async function invoicesPage(){const rows=await safe("invoices");return table("Sales",`${rows.length} invoice${rows.length===1?"":"s"}`,rows,[["Invoice",r=>`<strong>${esc(r.invoice_number||"Invoice")}</strong>`],["Total",r=>money(r.total)],["Paid",r=>money(r.amount_paid)],["Balance",r=>money(Math.max(0,Number(r.total||0)-Number(r.amount_paid||0)))],["Status",r=>`<span class="ob-status ${Number(r.amount_paid||0)>=Number(r.total||0)?"done":"open"}">${esc(r.status||(Number(r.amount_paid||0)>=Number(r.total||0)?"Paid":"Open"))}</span>`]],"No invoices yet","Your sales documents will appear here once you create the first one.","quick-invoice");}
-  async function genericPage(){const [title,description]=meta[state.page];return `<article class="ob-feature"><div class="ob-feature-art">${icon(state.page==="crm"?"crm":state.page==="finance"?"finance":state.page==="reports"?"reports":"spark")}</div><span class="ob-eyebrow">${title.toUpperCase()}</span><h2>${title}</h2><p>${description}</p><div class="ob-feature-line"><span>CONNECTED WORKSPACE</span><b>This area is being built on the same live business foundation.</b></div><button class="ob-primary" data-action="quick-add">${icon("plus")} Start here</button></article>`;}
 
-  async function renderPage(){const content=document.getElementById("workspace-content");if(!content)return;content.innerHTML=`<div class="ob-loading"><span></span><span></span><span></span></div>`;try{let html;if(state.page==="dashboard")html=await dashboard();else if(state.page==="customers")html=await customersPage();else if(state.page==="inventory")html=await inventoryPage();else if(state.page==="invoices")html=await invoicesPage();else html=await genericPage();content.innerHTML=html;}catch(error){console.error("OrbitBiz workspace render failed:",error);content.innerHTML=`<div class="ob-error"><div>${icon("spark")}</div><h3>Something interrupted this view.</h3><p>Your session is safe. Try again.</p><button class="ob-primary" data-action="retry">Try again</button></div>`;}}
-  function toast(message){let n=document.querySelector(".ob-toast");if(!n){n=document.createElement("div");n.className="ob-toast";document.body.appendChild(n)}n.textContent=message;n.classList.add("show");setTimeout(()=>n.classList.remove("show"),2200);}
-  function modal(title,body){document.querySelector(".ob-modal")?.remove();const n=document.createElement("div");n.className="ob-modal";n.innerHTML=`<div class="ob-modal-backdrop" data-close></div><div class="ob-modal-card"><div class="ob-modal-head"><div><span class="ob-eyebrow">ORBITBIZ</span><h3>${title}</h3></div><button data-close>×</button></div>${body}</div>`;document.body.appendChild(n);n.querySelectorAll("[data-close]").forEach(x=>x.addEventListener("click",()=>n.remove()));return n;}
-  const field=(label,name,type="text",required=false)=>`<label class="ob-field"><span>${label}</span><input name="${name}" type="${type}" ${required?"required":""}></label>`;
-  function newCustomer(){const n=modal("Add customer",`<form class="ob-form" data-form="customer">${field("Name","name","text",true)}${field("Company","company_name")}${field("Phone","phone","tel")}${field("Email","email","email")}<button class="ob-primary" type="submit">Save customer ${icon("arrow")}</button></form>`);n.querySelector("form").addEventListener("submit",saveCustomer);}
-  async function saveCustomer(e){e.preventDefault();const form=e.currentTarget;const data=Object.fromEntries(new FormData(form).entries());data.business_id=state.businessId;try{const r=await db().from("customers").insert(data);if(r.error)throw r.error;form.closest(".ob-modal")?.remove();toast("Customer added");renderPage();}catch(x){toast(x.message||"Could not save customer");}}
-  function newItem(){const n=modal("Add item",`<form class="ob-form" data-form="item">${field("Item name","name","text",true)}${field("SKU","sku")}${field("Sale price","selling_price","number")}${field("Tax rate","tax_rate","number")}<button class="ob-primary" type="submit">Save item ${icon("arrow")}</button></form>`);n.querySelector("form").addEventListener("submit",saveItem);}
-  async function saveItem(e){e.preventDefault();const form=e.currentTarget;const data=Object.fromEntries(new FormData(form).entries());data.business_id=state.businessId;data.selling_price=Number(data.selling_price||0);data.tax_rate=Number(data.tax_rate||0);try{const r=await db().from("items").insert(data);if(r.error)throw r.error;form.closest(".ob-modal")?.remove();toast("Item added");renderPage();}catch(x){toast(x.message||"Could not save item");}}
-  function quickAdd(){const n=modal("Choose an action",`<div class="ob-choice-grid"><button data-action="new-customer"><i class="tone-pink">${icon("customers")}</i><b>Customer</b><small>Add a relationship</small></button><button data-action="quick-invoice"><i class="tone-yellow">${icon("invoices")}</i><b>Invoice</b><small>Create a sale</small></button><button data-action="new-item"><i class="tone-green">${icon("inventory")}</i><b>Item</b><small>Add to catalogue</small></button></div>`);n.querySelectorAll("[data-action]").forEach(b=>b.addEventListener("click",()=>{const a=b.dataset.action;n.remove();if(a==="new-customer")newCustomer();if(a==="new-item")newItem();if(a==="quick-invoice"){state.page="invoices";sync();}}));}
-  function sync(){root.innerHTML=layout();renderPage();}
+  function handleClick(event) {
+    const pageButton = event.target.closest("[data-page]");
+    if (pageButton) {
+      event.preventDefault();
+      state.navigate(pageButton.dataset.page);
+      return;
+    }
+    const actionButton = event.target.closest("[data-action]");
+    if (!actionButton) return;
+    const action = actionButton.dataset.action;
+    if (action === "signout") core.auth?.signOut?.().then(() => location.reload());
+    else if (action === "quick-add") w.quickAdd(state);
+    else if (action === "new-customer") w.newCustomer(state);
+    else if (action === "new-item") w.newItem(state);
+    else if (action === "quick-invoice") state.navigate("invoices");
+    else if (action === "retry") renderPage();
+    else if (action === "search") w.toast("Search will connect to your workspace records in the next pass");
+  }
 
-  document.addEventListener("click",e=>{const p=e.target.closest("[data-page]");if(p){e.preventDefault();state.page=p.dataset.page;sync();return;}const a=e.target.closest("[data-action]")?.dataset.action;if(!a)return;if(a==="signout")core.auth?.signOut?.().then(()=>location.reload());else if(a==="quick-add")quickAdd();else if(a==="new-customer")newCustomer();else if(a==="new-item")newItem();else if(a==="quick-invoice"){state.page="invoices";sync();}else if(a==="retry")renderPage();else if(a==="search")toast("Search will connect to your workspace records in the next pass");});
+  function mount(detail = {}) {
+    state.user = detail.user || core.auth?.currentUser || null;
+    state.businessId = detail.businessId || core.activeBusinessId || localStorage.getItem("orbitbiz.activeBusinessId") || "";
+    if (!state.businessId) return;
+    document.querySelector("#orbit-biz-landing")?.remove();
+    document.querySelector(".ob-auth")?.remove();
+    document.querySelector(".ob-onboarding")?.remove();
+    sync();
+  }
 
-  function mount(detail={}){state.user=detail.user||core.auth?.currentUser||null;state.businessId=detail.businessId||core.activeBusinessId||localStorage.getItem("orbitbiz.activeBusinessId")||"";if(!state.businessId)return;document.querySelector("#orbit-biz-landing")?.remove();document.querySelector(".ob-auth")?.remove();document.querySelector(".ob-onboarding")?.remove();sync();}
-  core.events?.on("auth:ready",mount);window.addEventListener("auth:ready",e=>mount(e.detail||{}));
-  if(core.auth?.currentUser&&state.businessId)mount({user:core.auth.currentUser,businessId:state.businessId});
+  document.addEventListener("click", handleClick);
+  core.events?.on("auth:ready", mount);
+  window.addEventListener("auth:ready", event => mount(event.detail || {}));
+  if (core.auth?.currentUser && state.businessId) mount({user: core.auth.currentUser, businessId: state.businessId});
 })();
