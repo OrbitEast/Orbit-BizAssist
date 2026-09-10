@@ -1,0 +1,23 @@
+/* Orbit Biz — unified invoice modal polish */
+.invoice-ux-lock{overflow:hidden}
+.invoice-head{min-height:76px;height:auto;padding:18px 23px;background:rgba(255,255,255,.98)}
+.invoice-head h2{margin:4px 0 0;font-size:21px;font-weight:780}
+.invoice-head-note{margin:5px 0 0;color:#85828a;font-size:10.5px;line-height:1.4}
+.invoice-section-heading-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.invoice-section-hint{font-size:9px;font-weight:600;color:#98949d;letter-spacing:0;text-transform:none}
+.invoice-lines-empty{display:flex;align-items:center;justify-content:center;gap:4px;min-height:72px;margin-bottom:9px;border:1px dashed #d8d5df;border-radius:11px;background:#faf9fc;color:#8a8690;font-size:10px;text-align:center}
+.invoice-lines-empty strong{color:#6840c9;font-weight:800}
+.invoice-modal{padding:24px}
+.invoice-dialog{max-height:calc(100vh - 48px);height:min(860px,calc(100vh - 48px));border-radius:18px}
+.invoice-form{padding:20px 21px 16px}
+.invoice-preview-wrap{padding:20px 21px}
+.invoice-item-dialog{width:min(600px,100%);max-height:calc(100vh - 32px)}
+.item-popup-head{padding:20px 22px 16px}
+.item-popup-body{padding:20px 22px 18px}
+.item-popup-actions{padding:14px 22px}
+.item-popup-head h3{font-weight:780}
+.invoice-item-modal{padding:16px}
+.invoice-close{transition:background .15s ease,border-color .15s ease,color .15s ease,transform .15s ease}
+.invoice-close:hover{transform:translateY(-1px)}
+@media(max-width:850px){.invoice-modal{padding:0}.invoice-dialog{height:100vh;max-height:none;border-radius:0}.invoice-head{padding:17px 16px 14px}.invoice-form{padding:15px 15px 12px}.invoice-preview-wrap{padding:16px}.invoice-item-dialog{max-height:94vh}.invoice-section-hint{display:none}.invoice-lines-empty{min-height:64px}}
+@media(prefers-color-scheme:dark){.invoice-head-note{color:#9b97a0}.invoice-lines-empty{border-color:#45414c;background:#19181d;color:#aaa6af}.invoice-ux-lock{background:#111}.invoice-head{background:#1b1b1f;border-color:#333238}.invoice-dialog{background:#151518}.invoice-section-hint{color:#817d87}}
