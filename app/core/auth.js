@@ -29,7 +29,39 @@
     document.querySelector(".ref-app")?.remove();
     document.querySelector(".ob-onboarding")?.remove();
     const isSignup = mode === "signup";
-    root.innerHTML = `<section class="ob-auth" aria-label="Orbit Biz authentication"><div class="ob-auth-card"><button class="ob-auth-brand" type="button" data-auth-back><img src="favicon.svg" alt="Orbit East"><b>Orbit</b><small>Biz</small></button><div class="ob-auth-label">${isSignup ? "GET STARTED" : "WELCOME BACK"}</div><h1>${isSignup ? "Create your Orbit Biz workspace." : "Sign in to Orbit Biz."}</h1><p>${isSignup ? "Start with your business and build your workspace from there." : "Continue to your business workspace."}</p><button class="ob-google-btn" type="button" data-google><span class="ob-google-g">G</span><span>Continue with Google</span></button>${error ? `<div class="ob-auth-error" role="alert">${escapeHtml(error)}</div>` : ""}<div class="ob-auth-divider"><span>Secure authentication</span></div><small class="ob-auth-note">Your account is secured by Supabase Auth. Orbit Biz never asks for your Google password.</small><button class="ob-auth-back" type="button" data-auth-back>← Back to Orbit Biz</button></div></section>`;
+    root.innerHTML = `<section class="ob-auth" aria-label="Orbit Biz authentication">
+      <div class="ob-auth-art">
+        <button class="ob-auth-brand" type="button" data-auth-back aria-label="Back to Orbit Biz">
+          <img src="assets/orbiteastfavicon.png" alt="Orbit East">
+          <b>Orbit</b><small>Biz</small>
+        </button>
+        <div class="ob-auth-art-copy">
+          <span class="ob-auth-kicker">Business, in one orbit</span>
+          <h2>Run it<br><em>your way.</em></h2>
+          <p>Customers, sales, inventory, finance and reports — one connected workspace designed to make everyday business simpler.</p>
+        </div>
+        <div class="ob-auth-stickers" aria-hidden="true">
+          <span class="ob-auth-sticker">CRM</span>
+          <span class="ob-auth-sticker">INVENTORY</span>
+          <span class="ob-auth-sticker">FINANCE</span>
+        </div>
+      </div>
+      <div class="ob-auth-panel">
+        <div class="ob-auth-card">
+          <div class="ob-auth-label">${isSignup ? "GET STARTED" : "WELCOME BACK"}</div>
+          <h1>${isSignup ? "Create your workspace." : "Welcome back."}</h1>
+          <p>${isSignup ? "Start with your Google account. We’ll take you into business setup next." : "Sign in securely and continue to your business workspace."}</p>
+          <button class="ob-google-btn" type="button" data-google>
+            <span class="ob-google-g" aria-hidden="true">G</span>
+            <span>Continue with Google</span>
+          </button>
+          ${error ? `<div class="ob-auth-error" role="alert">${escapeHtml(error)}</div>` : ""}
+          <div class="ob-auth-divider"><span>Secure sign-in</span></div>
+          <small class="ob-auth-note">Authentication is handled securely through your connected account. Your Google password is never shared with Orbit Biz.</small>
+          <button class="ob-auth-back" type="button" data-auth-back>← Back to Orbit Biz</button>
+        </div>
+      </div>
+    </section>`;
     root.querySelectorAll("[data-auth-back]").forEach(button => button.addEventListener("click", () => location.reload()));
     root.querySelector("[data-google]")?.addEventListener("click", signInWithGoogle);
   }
